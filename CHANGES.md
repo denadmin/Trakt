@@ -46,5 +46,5 @@ installed as a PWA and deployed to GitHub Pages (or any static host).
 yarn install
 yarn dev:pwa       # local dev server on :8081
 yarn build         # production PWA build (served from /)
-DEPLOY_BASE=/PTN-Ninja/ yarn build   # build for a Pages subpath
+DEPLOY_BASE=/Trakt/ yarn build   # build for a Pages subpath
 ```

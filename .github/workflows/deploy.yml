@@ -31,7 +31,7 @@ jobs:
       - name: Build PWA
         env:
           NODE_OPTIONS: --openssl-legacy-provider
-          # GitHub Pages serves this repo under /PTN-Ninja/; the app reads
+          # GitHub Pages serves this repo under /<repo-name>/; the app reads
           # DEPLOY_BASE to emit absolute asset URLs and the precache manifest.
           DEPLOY_BASE: /${{ github.event.repository.name }}/
         run: npx quasar build -m pwa

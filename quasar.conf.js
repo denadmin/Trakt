@@ -10,8 +10,9 @@ module.exports = function (ctx) {
     fs.readFileSync(path.join(__dirname, "package.json"), "utf-8")
   ).version;
 
-  // Base path the built app is served from (e.g. "/" locally, or
-  // "/PTN-Ninja/" on GitHub Pages). Override with the DEPLOY_BASE env var.
+  // Base path the built app is served from (e.g. "/" locally, or the
+  // GitHub Pages repo subpath like "/Trakt/"). Override with the DEPLOY_BASE
+  // env var; CI passes it as "/<repo-name>/".
   const deployBase = process.env.DEPLOY_BASE || "/";
 
   return {
