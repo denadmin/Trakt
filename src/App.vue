@@ -1,6 +1,7 @@
 <template>
   <div id="q-app" class="absolute-fit no-scroll">
     <router-view ref="layout" />
+    <bot-opponent />
   </div>
 </template>
 
@@ -9,6 +10,7 @@ import ICONS from "./icons";
 import { postMessage } from "./utilities";
 import { isString } from "lodash";
 import { preload as preloadTakAnnotator } from "./bots/tak-annotator";
+import BotOpponent from "./components/BotOpponent";
 
 const _playtakSvgReq = require("./assets/playtak.svg");
 const PLAYTAK_SVG =
@@ -18,6 +20,7 @@ const PLAYTAK_SVG =
 
 export default {
   name: "App",
+  components: { BotOpponent },
   created() {
     if (process.env.DEV) {
       window.app = this;

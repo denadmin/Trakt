@@ -43,12 +43,16 @@
                 <q-item-section>{{ $t("Files") }}</q-item-section>
               </q-item>
 
-              <!-- PlayTak Game -->
-              <q-item @click="playTak" clickable v-ripple>
+              <!-- Play vs Bot -->
+              <q-item
+                @click="$router.push({ name: 'bot-game' })"
+                clickable
+                v-ripple
+              >
                 <q-item-section avatar>
-                  <q-icon name="playtak" />
+                  <q-icon name="mdi-robot-outline" />
                 </q-item-section>
-                <q-item-section>{{ $tc("PlayTak Game") }}</q-item-section>
+                <q-item-section>{{ $t("Play vs Bot") }}</q-item-section>
               </q-item>
             </q-list>
           </q-tab-panel>
@@ -93,18 +97,11 @@
       no-route-dismiss
     />
 
-    <PlayTakGameID
-      v-model="showPlayTakID"
-      @submit="close"
+    <EditPTN
+      v-model="showPTN"
+      :ptn="ptn"
+      @submit="clipboardCreate"
       no-route-dismiss
-      go-back
-    />
-
-    <PlayTakGame
-      v-model="showPlayTak"
-      @submit="close"
-      no-route-dismiss
-      go-back
     />
   </small-dialog>
 </template>
@@ -112,8 +109,6 @@
 <script>
 import GameInfo from "../components/controls/GameInfo";
 import EditPTN from "../dialogs/EditPTN.vue";
-import PlayTakGame from "../dialogs/PlayTakGame.vue";
-import PlayTakGameID from "../dialogs/PlayTakGameID.vue";
 // import GameTable from "../components/controls/GameTable";
 import MoreToggle from "../components/controls/MoreToggle.vue";
 
@@ -124,8 +119,6 @@ export default {
   components: {
     GameInfo,
     EditPTN,
-    PlayTakGame,
-    PlayTakGameID,
     /* GameTable, */
     MoreToggle,
   },
@@ -272,9 +265,6 @@ export default {
 
       await this.$store.dispatch("game/ADD_GAMES", { games });
       this.close();
-    },
-    playTak() {
-      this.showPlayTak = true;
     },
     createGame({ name, tags, editTPS }) {
       this.player1 = tags.player1;

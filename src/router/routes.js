@@ -124,6 +124,11 @@ const routes = [
         component: () => import("../dialogs/AddGame"),
       },
       {
+        name: "bot-game",
+        path: "/bot-game",
+        component: () => import("../dialogs/BotGame"),
+      },
+      {
         name: "bot",
         path: "/engine/:botID?",
         component: () => import("../dialogs/EditBot"),
