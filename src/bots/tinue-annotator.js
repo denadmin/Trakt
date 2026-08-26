@@ -18,7 +18,7 @@ import store from "../store";
 import { pliesEqual } from "../Game/PTN/Ply";
 
 const workerUrl = new URL(
-  "/tinue-solver/tinue-solver.worker.js",
+  "../tinue-solver/tinue-solver.worker.js",
   import.meta.url
 );
 

@@ -135,7 +135,7 @@ export default {
     },
     analysisSource() {
       if (this.$store.state.ui.embed) return "embed";
-      return this.analysisState.analysisSource || "openings";
+      return this.analysisState.analysisSource || "engines";
     },
     tps() {
       return this.$store.state.game.position.tps;
@@ -180,8 +180,6 @@ export default {
       }
 
       switch (this.analysisSource) {
-        case "openings":
-          return this.analysisState.currentOpeningMoves || [];
         case "engines": {
           const analysis = this.analysisState;
           const botID = analysis.botID;
@@ -397,14 +395,7 @@ export default {
     },
 
     computeSubjectiveEvals(moves) {
-      const isOpenings = this.analysisSource === "openings";
       return moves.map((m) => {
-        if (isOpenings) {
-          if (!m.totalGames || m.totalGames === 0) return 100;
-          const wins = this.turn === 1 ? m.wins1 : m.wins2;
-          const draws = m.draws || 0;
-          return ((wins + draws * 0.5) / m.totalGames) * 200;
-        }
         if (m.evaluation === null || m.evaluation === undefined) return null;
         return this.turn === 1 ? 100 + m.evaluation : 100 - m.evaluation;
       });
@@ -416,38 +407,6 @@ export default {
 
       if (moves.length === 0) return [];
       if (moves.length === 1) return [DEFAULT_OPACITY];
-
-      // For openings, opacity is based on commonality (totalGames) of each
-      // move relative to the previous one, with a bounded step-down.
-      if (this.analysisSource === "openings") {
-        const MAX_OPACITY_DIFF = 0.15;
-        const opacities = [];
-        let prevOpacity = DEFAULT_OPACITY;
-        let prevCommonality = null;
-        for (let i = 0; i < moves.length; i++) {
-          const commonality = Number(moves[i].totalGames) || 0;
-          if (i === 0) {
-            opacities.push(DEFAULT_OPACITY);
-            prevCommonality = commonality;
-            continue;
-          }
-          let opacity;
-          if (!prevCommonality) {
-            opacity = MIN_OPACITY;
-          } else {
-            const rel = commonality / prevCommonality;
-            opacity = Math.max(
-              prevOpacity * rel,
-              prevOpacity - MAX_OPACITY_DIFF
-            );
-          }
-          opacity = Math.min(DEFAULT_OPACITY, Math.max(MIN_OPACITY, opacity));
-          opacities.push(opacity);
-          prevOpacity = opacity;
-          prevCommonality = commonality;
-        }
-        return opacities;
-      }
 
       // For engines, opacity is an exponential of the subjective eval
       // relative to the best move: 0.2 + 0.8 * e^(K * (x - B) / B).
@@ -474,12 +433,6 @@ export default {
 
       if (moves.length === 0) return [];
       if (moves.length === 1) return [MAX_SCALE];
-
-      // For openings, size derives from opacity via strengthScale.
-      // Returning null lets the element renderers fall back to that.
-      if (this.analysisSource === "openings") {
-        return moves.map(() => null);
-      }
 
       // For engines, scale uses the same exponential shape as opacity but
       // with its own K and floor: MIN_SCALE + (1 - MIN_SCALE) * e^(K*(x-B)/B).

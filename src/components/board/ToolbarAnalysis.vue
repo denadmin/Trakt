@@ -5,13 +5,7 @@
       :class="{ embedded: isEmbedded }"
     >
       <template
-        v-if="
-          !isEmbedded &&
-          analysisSource !== 'openings' &&
-          resolvedBot &&
-          resolvedBotState &&
-          resolvedBotMeta
-        "
+        v-if="!isEmbedded && resolvedBot && resolvedBotState && resolvedBotMeta"
       >
         <!-- Interactive Analysis -->
         <q-btn
@@ -299,22 +293,10 @@
         @contextmenu.prevent.stop="toggleAnalysisVisualizations"
       >
         <q-icon
-          :name="
-            analysisSource === 'openings'
-              ? 'opening'
-              : viewingSavedResults
-              ? 'save'
-              : botOption.icon || 'engine'
-          "
+          :name="viewingSavedResults ? 'save' : botOption.icon || 'engine'"
         />
         <hint>
-          {{
-            analysisSource === "openings"
-              ? $t("Openings")
-              : viewingSavedResults
-              ? savedResultsLabel
-              : botOption.label
-          }}
+          {{ viewingSavedResults ? savedResultsLabel : botOption.label }}
         </hint>
         <q-menu
           anchor="top right"
@@ -323,20 +305,6 @@
           transition-hide="none"
         >
           <q-list>
-            <q-item
-              clickable
-              v-close-popup
-              @click="selectOpenings"
-              :active="analysisSource === 'openings'"
-            >
-              <q-item-section avatar>
-                <q-icon name="opening" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>{{ $t("Openings") }}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-separator />
             <q-item
               v-for="(id, idx) in activeBots"
               :key="idx"
@@ -396,7 +364,6 @@
           v-else-if="
             isEmbedded ||
             botSuggestion ||
-            analysisSource === 'openings' ||
             (botState &&
               (botState.isInteractiveEnabled ||
                 botState.isAnalyzingGame ||
@@ -439,29 +406,9 @@
               </div>
             </template>
           </BotAnalysisItem>
-          <div
-            v-else-if="analysisSource === 'openings'"
-            class="relative-position"
-          >
-            <AnalysisItemPlaceholder :static="!openingStats.loading" />
-            <q-item
-              v-if="!openingStats.loading && !openingStats.available"
-              class="flex-center text-center absolute-center full-width"
-              :class="'text-' + textColor"
-            >
-              {{ $t("analysis.database.beyondRange") }}
-            </q-item>
-            <q-item
-              v-else-if="!openingStats.loading"
-              class="flex-center text-center absolute-center full-width"
-              :class="'text-' + textColor"
-            >
-              {{ $t("analysis.database.newPosition") }}
-            </q-item>
-          </div>
           <AnalysisItemPlaceholder v-else />
         </template>
-        <template v-else-if="analysisSource !== 'openings'">
+        <template v-else>
           <q-item-label caption>
             <span class="bot-name absolute">{{ resolvedBot.label }}</span>
           </q-item-label>
@@ -720,7 +667,7 @@ export default {
     },
     analysisSource() {
       if (this.isEmbedded) return "embed";
-      return this.analysisState.analysisSource || "openings";
+      return this.analysisState.analysisSource || "engines";
     },
     preferSavedResults() {
       return this.analysisState.preferSavedResults ?? true;
@@ -799,12 +746,6 @@ export default {
     hasCurrentBotSuggestions() {
       return this.currentBotSuggestions.length > 0;
     },
-    openingSuggestions() {
-      return this.analysisState.currentOpeningMoves || [];
-    },
-    openingStats() {
-      return this.analysisState.openingStats || {};
-    },
     showLiveCurrentPositionInSavedMode() {
       if (this.analysisSource !== "saved") {
         return false;
@@ -831,8 +772,6 @@ export default {
         return this.$store.getters["game/suggestions"](this.tps) || [];
       }
       switch (this.analysisSource) {
-        case "openings":
-          return this.openingSuggestions;
         case "saved":
           if (this.showLiveCurrentPositionInSavedMode) {
             return this.currentBotSuggestions;
@@ -1009,11 +948,6 @@ export default {
       this.$store.dispatch("analysis/SELECT_SAVED_ENGINE", botName);
       this.manualBotSelection = false;
     },
-    selectOpenings() {
-      if (!this.$store.state.analysis) return;
-      this.$store.dispatch("analysis/SELECT_OPENINGS");
-      this.manualBotSelection = false;
-    },
     getBotIcon(botId) {
       const bot = bots[botId];
       return bot ? bot.icon : "engine";
@@ -1114,8 +1048,8 @@ export default {
         return;
       }
 
-      // Build list of selectable options: openings + bots + per-engine saved results
-      const options = [{ type: "openings" }];
+      // Build list of selectable options: bots + per-engine saved results
+      const options = [];
       this.activeBots.forEach((id) => {
         options.push({ type: "bot", id });
       });
@@ -1141,9 +1075,7 @@ export default {
 
         // Find current index
         let currentIndex;
-        if (this.analysisSource === "openings") {
-          currentIndex = 0;
-        } else if (this.analysisSource === "saved") {
+        if (this.analysisSource === "saved") {
           currentIndex = options.findIndex(
             (o) => o.type === "saved" && o.name === this.savedBotName
           );
@@ -1164,9 +1096,7 @@ export default {
 
         // Select the new option
         const selected = options[currentIndex];
-        if (selected.type === "openings") {
-          this.selectOpenings();
-        } else if (selected.type === "saved") {
+        if (selected.type === "saved") {
           this.selectSavedEngine(selected.name);
         } else {
           this.selectBot(selected.id);

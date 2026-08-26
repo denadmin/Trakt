@@ -87,7 +87,7 @@ const defaultState = {
   showToolbarAnalysis: true,
   size: "6",
   stackCounts: false,
-  textTab: "openings",
+  textTab: "engines",
   theme: THEMES.find((t) => t.id === "classic"),
   themeID: "classic",
   themeManualMode: false,

@@ -14,7 +14,7 @@ const defaultState = {
   botID: defaultBotID, // Used for ToolbarAnalysis and other eval bars
   savedBotName: null, // Bot name for saved results selection (null = "Other"/unnamed)
   preferSavedResults: true, // Whether to show saved results over bot analysis
-  analysisSource: "openings", // Board overlay data source: "openings", "engines", or "saved"
+  analysisSource: "engines", // Board overlay data source: "engines" or "saved"
   botSettings: {}, // Per-bot settings (persisted)
   // Persisted per-bot meta overrides (e.g. evalMarkThresholds for built-in bots)
   botMetaOverrides: {},
@@ -37,27 +37,6 @@ const defaultState = {
   showContinuation: true,
   autoSaveEachPosition: false,
   autoSaveOnSearchComplete: false,
-  dbSettings: {
-    includeBotGames: false,
-    openGamesInNewTab: false,
-    player1: [],
-    player2: [],
-    minRating: null,
-    komi: [],
-    maxSuggestedMoves: 5,
-    maxTopGames: 5,
-    tournament: null,
-    minDate: null,
-    maxDate: null,
-  },
-  currentOpeningMoves: [],
-  openingPositions: {},
-  openingStats: {
-    totalGames: 0,
-    moveCount: 0,
-    available: false,
-    dbMinRating: 0,
-  },
 };
 forEach(bots, (bot, id) => {
   defaultState.botSettings[id] = cloneDeep(bot.settings);
@@ -156,11 +135,15 @@ if (
 }
 // Remove deprecated collapsedSavedBots
 delete state.collapsedSavedBots;
-defaults(state.dbSettings, defaultState.dbSettings);
 defaults(state.botSettings, defaultState.botSettings);
 Object.keys(defaultState.botSettings).forEach((bot) => {
   defaults(state.botSettings[bot], defaultState.botSettings[bot]);
 });
+
+// The openings source/tab was removed for the offline fork.
+if (state.analysisSource === "openings") {
+  state.analysisSource = "engines";
+}
 
 // Migrate renamed engine ids so users keep their selection/settings.
 // "syntaks" was renamed to "tinue-solver".
@@ -180,7 +163,7 @@ forEach({ syntaks: "tinue-solver" }, (newId, oldId) => {
 });
 
 if (state.activeBots.length === 0) {
-  const defaults = ["tiltak", "tinue-solver"].filter((id) => bots[id]);
+  const defaults = ["tiltak", "topaz", "tinue-solver"].filter((id) => bots[id]);
   if (defaults.length) {
     state.activeBots = defaults;
     state.analysisSource = "engines";
@@ -198,9 +181,9 @@ state.activeBots.forEach((botId) => {
     if (!state.botLogs[botId]) {
       state.botLogs[botId] = cloneDeep(bot.log);
     }
-    if (!state.botMetas[botId]) {
-      state.botMetas[botId] = cloneDeep(bot.meta);
-    }
+    // Always reflect the current engine meta (isInteractive, supported sizes, ...)
+    // rather than a value persisted from an older build.
+    state.botMetas[botId] = cloneDeep(bot.meta);
     if (!state.botStates[botId]) {
       state.botStates[botId] = cloneDeep(bot.state);
     }

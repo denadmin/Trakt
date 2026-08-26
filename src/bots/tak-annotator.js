@@ -17,7 +17,7 @@ import store from "../store";
 import Ply from "../Game/PTN/Ply";
 
 const workerUrl = new URL(
-  "/tiltak-wasm/tak-annotator.worker.js",
+  "../tiltak-wasm/tak-annotator.worker.js",
   import.meta.url
 );
 

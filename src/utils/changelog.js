@@ -136,17 +136,6 @@ export function hasUnseenChanges({ lastSeenVersion } = {}) {
 // Whether this load followed an update whose notes the user hasn't seen.
 // Called once on startup, with the ui/showChangelogAfterUpdate preference.
 export function shouldShowChangelogAfterUpdate({ showAfterUpdate } = {}) {
-  if (!hasSeenAnyVersion()) {
-    // Nothing to compare against, so record the running version rather than
-    // greeting a first-time visitor with a changelog. The next update is then
-    // the first one that can open it.
-    markVersionSeen();
-    return false;
-  }
-  // The watermark is deliberately left alone while the preference is off, so
-  // the menu badge still reports what's unread.
-  return (
-    Boolean(showAfterUpdate) &&
-    hasUnseenChanges({ lastSeenVersion: getLastSeenVersion() })
-  );
+  // The changelog is removed for the offline fork.
+  return false;
 }

@@ -7,8 +7,12 @@ module.exports = function (ctx) {
   // Expose the app version (from package.json) so the client can drive the
   // in-app changelog / "What's New" dialog and version tracking.
   const appVersion = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "package.json"), "utf-8"),
+    fs.readFileSync(path.join(__dirname, "package.json"), "utf-8")
   ).version;
+
+  // Base path the built app is served from (e.g. "/" locally, or
+  // "/PTN-Ninja/" on GitHub Pages). Override with the DEPLOY_BASE env var.
+  const deployBase = process.env.DEPLOY_BASE || "/";
 
   return {
     // app boot file (/src/boot)
@@ -36,6 +40,7 @@ module.exports = function (ctx) {
     },
 
     build: {
+      publicPath: deployBase,
       env: {
         ...require("dotenv").config().parsed,
         PLAYTAK_BETA: ctx.dev || ctx.debug,
@@ -43,7 +48,9 @@ module.exports = function (ctx) {
         APP_VERSION: appVersion,
       },
       scopeHoisting: true,
-      vueRouterMode: "history",
+      // Hash routing so deep links work on static hosts (GitHub Pages) that
+      // would otherwise 404 on any path other than the index document.
+      vueRouterMode: "hash",
       // vueCompiler: true,
       // gzip: true,
       // analyze: true,
@@ -70,7 +77,7 @@ module.exports = function (ctx) {
           {
             test: /\.js$/,
             loader: require.resolve("@open-wc/webpack-import-meta-loader"),
-          },
+          }
         );
       },
     },
@@ -104,10 +111,10 @@ module.exports = function (ctx) {
         skipWaiting: true,
         clientsClaim: true,
         // Serve the precached document for navigation requests that don't
-        // match a precached asset, so the client-side router (history mode)
-        // can handle deep links offline. Must match the precache manifest
-        // key exactly — createHandlerBoundToURL throws if it isn't precached.
-        navigateFallback: "/index.html",
+        // match a precached asset, so the client-side router can handle deep
+        // links offline. Must match the precache manifest key exactly (the
+        // deployBase-prefixed index document).
+        navigateFallback: `${deployBase}index.html`,
       },
       manifest: {
         name: "PTN Ninja",

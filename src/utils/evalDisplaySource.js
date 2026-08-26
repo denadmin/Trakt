@@ -10,26 +10,12 @@ export function getEvalNumberOrder(evalType) {
   return ["cp", "wdl", "advantage"];
 }
 
-export function isOpeningSuggestion(suggestion) {
-  return !!(
-    suggestion &&
-    "wins1" in suggestion &&
-    "wins2" in suggestion &&
-    "totalGames" in suggestion
-  );
-}
-
 export function getActiveEvalDisplaySource({
-  analysisSource,
   suggestion,
   evaluation,
   rawWdl,
   evalNumberOrder,
 }) {
-  if (isOpeningSuggestion(suggestion) || analysisSource === "openings") {
-    return "wdl";
-  }
-
   const hasTerminalScore =
     suggestion &&
     suggestion.scoreText &&
@@ -131,26 +117,11 @@ export function getLiveSuggestionInSavedMode(analysis, tps) {
 export function getSelectedSuggestionForTps({
   analysis,
   tps,
-  currentTps,
   getSuggestionsForTps,
   context,
 }) {
   if (!analysis) {
     return null;
-  }
-
-  if (analysis.analysisSource === "openings") {
-    const openingMoves =
-      analysis.openingPositions?.[tps] ||
-      (tps === currentTps ? analysis.currentOpeningMoves || [] : []);
-    return (
-      openingMoves.find(
-        (move) =>
-          move &&
-          Number(move.totalGames) > 0 &&
-          normalizeWDL(move.wdl, move.evaluation) !== null
-      ) || null
-    );
   }
 
   // In saved mode with autosave-per-position, prefer the live suggestion from

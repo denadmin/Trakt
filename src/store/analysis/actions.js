@@ -77,7 +77,7 @@ export const CANCEL_PENDING_ANALYSIS_SELECTION_PERSIST = () => {
 // faithfully restored.
 const isSelectionRestorable = (selection, getters) => {
   if (!selection || typeof selection !== "object") return false;
-  const validSources = ["openings", "engines", "saved"];
+  const validSources = ["engines", "saved"];
   if (!validSources.includes(selection.source)) return false;
   if (selection.source === "engines") {
     if (!selection.botID || !bots[selection.botID]) return false;
@@ -391,7 +391,6 @@ const applyCollapseByCompatibility = (state, commit, size, selectedID) => {
 
 // Maps an analysis source to the corresponding text-panel tab id.
 const TAB_FOR_SOURCE = {
-  openings: "openings",
   engines: "engines",
   saved: "notes",
 };
@@ -410,8 +409,8 @@ const syncTextTabToSource = (commit, rootState, source) => {
 
 // Called when loading/switching games. If there are saved results, select the
 // saved source. Otherwise, pick the first active engine that supports the
-// game's board size; if none, fall back to the opening explorer. Also syncs
-// the text-panel tab to match the selected source.
+// game's board size. Also syncs the text-panel tab to match the selected
+// source.
 export const SYNC_SAVED_ENGINE = ({
   state,
   getters,
@@ -439,10 +438,11 @@ export const SYNC_SAVED_ENGINE = ({
       }
       syncTextTabToSource(commit, rootState, "engines");
     } else {
-      if (state.analysisSource !== "openings") {
-        dispatch("SET", ["analysisSource", "openings"]);
+      // No active engine supports this board size; keep engines source.
+      if (state.analysisSource !== "engines") {
+        dispatch("SET", ["analysisSource", "engines"]);
       }
-      syncTextTabToSource(commit, rootState, "openings");
+      syncTextTabToSource(commit, rootState, "engines");
     }
     applyCollapseByCompatibility(state, commit, size, engineID);
     return;
@@ -524,10 +524,6 @@ export const SELECT_SAVED_ENGINE = ({ state, dispatch }, botName) => {
       }
     }
   }
-};
-
-export const SELECT_OPENINGS = ({ dispatch }) => {
-  dispatch("SET", ["analysisSource", "openings"]);
 };
 
 // Collapsed bots persistence

@@ -1,7 +1,6 @@
 import TeiBot from "./tei";
 
-const url = new URL("/tiltak-wasm/tiltak.worker.js", import.meta.url);
-let worker = null;
+const url = new URL("../tiltak-wasm/tiltak.worker.js", import.meta.url);
 
 export default class TiltakWasm extends TeiBot {
   constructor(options = {}) {
@@ -33,6 +32,7 @@ export default class TiltakWasm extends TeiBot {
 
     this.connect = null;
     this.disconnect = null;
+    this.worker = null;
 
     this.init();
   }
@@ -42,9 +42,9 @@ export default class TiltakWasm extends TeiBot {
 
   //#region send/receive
   send(message) {
-    if (worker) {
+    if (this.worker) {
       this.onSend(message);
-      worker.postMessage(message);
+      this.worker.postMessage(message);
     }
   }
   receive(message) {
@@ -69,12 +69,12 @@ export default class TiltakWasm extends TeiBot {
   init(force = false) {
     // Don't initialize worker in embed mode (iframe)
     if (window !== window.parent) return false;
-    if (force || !worker) {
+    if (force || !this.worker) {
       try {
-        worker = new Worker(url);
+        this.worker = new Worker(url);
 
         // Error handling
-        worker.onerror = (error) => {
+        this.worker.onerror = (error) => {
           console.info(
             "Tiltak (wasm) worker encountered an error. Restarting...",
             error.message
@@ -84,7 +84,7 @@ export default class TiltakWasm extends TeiBot {
         };
 
         // Message handling
-        worker.onmessage = ({ data }) => {
+        this.worker.onmessage = ({ data }) => {
           this.receive(data);
         };
 
@@ -100,14 +100,14 @@ export default class TiltakWasm extends TeiBot {
 
   //#region terminate
   async terminate(state) {
-    if (worker) {
+    if (this.worker) {
       try {
         if (this.state.isRunning) {
           this.send("stop");
         }
         this.onTerminate(state);
       } catch (error) {
-        await worker.terminate();
+        await this.worker.terminate();
         this.init();
       }
     }

@@ -113,12 +113,6 @@ const rawSuggestionsForTps = (state, tps, rootState, rootGetters) => {
   let rawMoves = [];
 
   switch (state.analysisSource) {
-    case "openings":
-      rawMoves =
-        tps === rootState.game.position.tps
-          ? state.currentOpeningMoves || []
-          : [];
-      break;
     case "engines": {
       const botID = state.botID;
       if (!botID) break;
@@ -235,7 +229,6 @@ export const plyEvalSuffix = (state, getters) => (ply) => {
 export const getEvalMarkOverride =
   (state, getters, rootState, rootGetters) => (ply) => {
     if (!ply) return null;
-    if (state.analysisSource === "openings") return null;
 
     if (state.preferSavedResults) {
       // Use saved eval mark from the PTN comment (does not change with thresholds)

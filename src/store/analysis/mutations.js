@@ -246,42 +246,6 @@ export const SET_SUGGESTION_PV_EXPANDED = (
   }
 };
 
-export const SET_OPENING_MOVES = (state, payload) => {
-  if (payload && typeof payload === "object" && !Array.isArray(payload)) {
-    const tps = payload.tps || null;
-    const moves = payload.moves || [];
-    state.currentOpeningMoves = moves;
-    if (tps) {
-      Vue.set(state.openingPositions, tps, moves);
-    }
-    return;
-  }
-
-  state.currentOpeningMoves = payload || [];
-};
-
-// Replace the entire openingPositions map. Used by the Opening Explorer when
-// filter settings change so stale moves for non-current positions are
-// discarded and any cached-for-current-filters moves are surfaced immediately.
-export const REPLACE_OPENING_POSITIONS = (state, positions) => {
-  Vue.set(state, "openingPositions", positions || {});
-};
-
 export const SET_HOVERED_OVERLAY_PLY_TEXT = (state, plyText) => {
   state.hoveredOverlayPlyText = plyText || null;
-};
-
-// Update opening explorer stats for display in the tab bar
-export const SET_OPENING_STATS = (
-  state,
-  { totalGames, moveCount, available, loading, dbMinRating }
-) => {
-  Vue.set(state, "openingStats", {
-    totalGames,
-    moveCount,
-    available,
-    loading: !!loading,
-    dbMinRating:
-      dbMinRating !== undefined ? dbMinRating : state.openingStats.dbMinRating,
-  });
 };

@@ -152,18 +152,6 @@
           align="justify"
           inline-label
         >
-          <q-tab v-if="hasAnalysis" name="openings">
-            <div class="row no-wrap items-center">
-              <q-icon name="opening" class="q-tab__icon" />
-              <smooth-reflow width-only>
-                <span
-                  v-if="textTab === 'openings' && $q.screen.gt.xs"
-                  class="q-tab__label q-ml-sm"
-                  >{{ $t("Openings") }}</span
-                >
-              </smooth-reflow>
-            </div>
-          </q-tab>
           <q-tab v-if="hasAnalysis" name="engines">
             <div class="row no-wrap items-center">
               <q-icon name="engine" class="q-tab__icon" />
@@ -211,19 +199,7 @@
             "
             style="opacity: 0.7"
           >
-            <template v-if="textTab === 'openings'">
-              <q-skeleton
-                v-if="openingStatsLoading"
-                width="10em"
-                height="1em"
-                animation="wave"
-                :dark="$store.state.ui.theme.isDark"
-                class="inline-block"
-                style="vertical-align: middle; border-radius: 3px"
-              />
-              <template v-else>{{ tabStatsOpenings }}</template>
-            </template>
-            <template v-else-if="textTab === 'engines'">
+            <template v-if="textTab === 'engines'">
               {{ tabStatsEngines }}
             </template>
             <template v-else-if="textTab === 'notes'">
@@ -231,11 +207,6 @@
             </template>
           </div>
           <div class="row items-center no-wrap">
-            <OpeningsFilterIcons
-              v-if="textTab === 'openings'"
-              class="q-mr-sm"
-            />
-
             <q-btn
               v-if="textTab !== 'notes'"
               @click="showTabSettings = !showTabSettings"
@@ -255,15 +226,7 @@
         </div>
         <div style="max-height: 50vh; overflow-y: auto">
           <smooth-reflow class="bg-ui" height-only>
-            <q-separator
-              v-if="
-                (showTabSettings && textTab === 'openings') ||
-                (showTabSettings && textTab === 'engines')
-              "
-            />
-            <OpeningsSettings
-              v-if="showTabSettings && textTab === 'openings'"
-            />
+            <q-separator v-if="showTabSettings && textTab === 'engines'" />
             <EnginesSettings v-if="showTabSettings && textTab === 'engines'" />
           </smooth-reflow>
         </div>
@@ -273,9 +236,6 @@
           keep-alive
           animated
         >
-          <q-tab-panel v-if="hasAnalysis" name="openings">
-            <Openings ref="openings" class="fit" recess />
-          </q-tab-panel>
           <q-tab-panel v-if="hasAnalysis" name="engines">
             <Analysis ref="analysis" class="fit" recess />
           </q-tab-panel>
@@ -287,10 +247,6 @@
           </q-tab-panel>
         </q-tab-panels>
       </div>
-      <OpeningExplorer
-        v-if="hasAnalysis && textTab !== 'openings'"
-        v-show="false"
-      />
       <div class="gt-xs absolute-fit inset-shadow no-pointer-events" />
     </q-drawer>
 
@@ -341,9 +297,6 @@ import CurrentMove from "../components/board/CurrentMove";
 import PTN from "../components/drawers/PTN";
 import Notes from "../components/drawers/Notes";
 import Analysis from "../components/drawers/Analysis";
-import Openings from "../components/drawers/Openings";
-import OpeningExplorer from "../components/drawers/OpeningExplorer";
-import OpeningsSettings from "../components/drawers/OpeningsSettings";
 import EnginesSettings from "../components/drawers/EnginesSettings";
 
 // Notifications:
@@ -368,7 +321,6 @@ import MainMenu from "../components/controls/MainMenu";
 import Highlighter from "../components/controls/Highlighter";
 import PieceSelector from "../components/controls/PieceSelector";
 import Chat from "../components/drawers/Chat";
-import OpeningsFilterIcons from "../components/drawers/OpeningsFilterIcons";
 
 import Game from "../Game";
 import { HOTKEYS } from "../keymap";
@@ -384,10 +336,6 @@ export default {
     PTN,
     Notes,
     Analysis,
-    Openings,
-    OpeningExplorer,
-    OpeningsSettings,
-    OpeningsFilterIcons,
     EnginesSettings,
     PlyTooltipProvider,
     ErrorNotifications,
@@ -468,10 +416,13 @@ export default {
     textTab: {
       get() {
         let tab = this.$store.state.ui.textTab;
-        if (tab === "chat" && !this.hasChat) {
-          tab = "openings";
+        if (tab === "openings") {
+          tab = "engines";
         }
-        if ((tab === "openings" || tab === "engines") && !this.hasAnalysis) {
+        if (tab === "chat" && !this.hasChat) {
+          tab = "engines";
+        }
+        if (tab === "engines" && !this.hasAnalysis) {
           tab = this.hasChat ? "chat" : "notes";
         }
         return tab;
@@ -514,21 +465,6 @@ export default {
     },
     isAnonymous() {
       return !this.user || this.user.isAnonymous;
-    },
-    openingStatsLoading() {
-      const stats = this.$store.state.analysis.openingStats;
-      return stats && stats.loading;
-    },
-    tabStatsOpenings() {
-      const stats = this.$store.state.analysis.openingStats;
-      if (!stats || !stats.available || stats.loading) return "";
-      const gamesStr = this.$tc("analysis.n_games", stats.totalGames, {
-        count: this.$n(stats.totalGames, "n0"),
-      });
-      const movesStr = this.$tc("analysis.n_moves", stats.moveCount, {
-        count: this.$n(stats.moveCount, "n0"),
-      });
-      return `${gamesStr} · ${movesStr}`;
     },
     tabStatsEngines() {
       const analysis = this.$store.state.analysis;
@@ -965,7 +901,7 @@ export default {
         case "toggleText":
           let tabs = [];
           if (this.hasAnalysis) {
-            tabs.push("openings", "engines");
+            tabs.push("engines");
           }
           tabs.push("notes");
           if (this.hasChat) {
@@ -1010,7 +946,7 @@ export default {
       this.$router.push({ name: "help", params: { section: "usage" } });
     },
     changelog() {
-      this.$router.push({ name: "changelog" });
+      // Changelog removed for the offline fork.
     },
     // Open the changelog once per load when the app has updated since the
     // user last read it. Called at the end of init(), by which point getGame()

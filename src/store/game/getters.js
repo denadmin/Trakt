@@ -524,21 +524,6 @@ export const evaluationForTps =
         ? suggestions[0].evaluation
         : null;
     }
-    if (analysis.analysisSource === "openings") {
-      const openingMoves =
-        analysis.openingPositions?.[tps] ||
-        (tps === state.position.tps ? analysis.currentOpeningMoves || [] : []);
-      const topMove = openingMoves.find(
-        (move) =>
-          move &&
-          Number(move.totalGames) > 0 &&
-          normalizeWDL(move.wdl, move.evaluation) !== null
-      );
-      if (topMove) {
-        return topMove.evaluation ?? null;
-      }
-      return null;
-    }
 
     const liveSuggestion = getLiveSuggestionInSavedMode(analysis, tps);
     if (liveSuggestion && liveSuggestion.evaluation != null) {
@@ -581,21 +566,6 @@ export const wdlForTps =
       const suggestions = getters.suggestions(tps, context);
       if (suggestions.length > 0) {
         return normalizeWDL(suggestions[0].wdl, suggestions[0].evaluation);
-      }
-      return null;
-    }
-    if (analysis.analysisSource === "openings") {
-      const openingMoves =
-        analysis.openingPositions?.[tps] ||
-        (tps === state.position.tps ? analysis.currentOpeningMoves || [] : []);
-      const topMove = openingMoves.find(
-        (move) =>
-          move &&
-          Number(move.totalGames) > 0 &&
-          normalizeWDL(move.wdl, move.evaluation) !== null
-      );
-      if (topMove) {
-        return normalizeWDL(topMove.wdl, topMove.evaluation);
       }
       return null;
     }
