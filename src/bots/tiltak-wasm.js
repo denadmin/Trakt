@@ -1,6 +1,6 @@
 import TeiBot from "./tei";
 
-const url = new URL("../tiltak-wasm/tiltak.worker.js", import.meta.url);
+const url = new URL("../../tiltak-wasm/tiltak.worker.js", import.meta.url);
 
 export default class TiltakWasm extends TeiBot {
   constructor(options = {}) {

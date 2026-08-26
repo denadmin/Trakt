@@ -1061,8 +1061,14 @@ export default {
     this.$store.registerModule("analysis", analysisStore);
     this.$store.commit("analysis/SET_BOT", this.$store.state.analysis.botID);
 
-    // Redirect hash URLs
-    if (location.hash.length && !this.$q.platform.is.electron) {
+    // Redirect hash URLs (legacy pre-hash-router share links). This only
+    // makes sense in history mode: in hash mode location.hash IS the route,
+    // so rewriting it would reload the page in an endless loop.
+    if (
+      process.env.VUE_ROUTER_MODE !== "hash" &&
+      location.hash.length &&
+      !this.$q.platform.is.electron
+    ) {
       const url = location.hash.substring(1);
       location.hash = "";
       this.$router.replace(url);

@@ -1,6 +1,6 @@
 import Bot from "./bot";
 
-const url = new URL("../topaz/topaz.worker.js", import.meta.url);
+const url = new URL("../../topaz/topaz.worker.js", import.meta.url);
 
 export default class TopazWasm extends Bot {
   constructor(options = {}) {

@@ -395,7 +395,8 @@ export default {
     },
   },
   beforeCreate() {
-    if (location.hash.length) {
+    // Legacy hash-URL redirect (see Main.vue) - disabled in hash router mode.
+    if (process.env.VUE_ROUTER_MODE !== "hash" && location.hash.length) {
       const url = location.hash.substring(1);
       location.hash = "";
       this.$router.replace(url);
