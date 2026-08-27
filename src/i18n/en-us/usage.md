@@ -2,7 +2,7 @@
 
 This is an editor and viewer for [Portable Tak Notation (PTN)](https://ustak.org/portable-tak-notation/). Originally built for transcription of live games, it has become a fully-featured analysis tool for the game [Tak](https://ustak.org/play-beautiful-game-tak/).
 
-PTN Ninja is a [progressive web app](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/What_is_a_progressive_web_app), which means you can install it on your device as if it were a native app. This provides several benefits, including faster load times.
+Trakt is a [progressive web app](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/What_is_a_progressive_web_app), which means you can install it on your device as if it were a native app. This provides several benefits, including faster load times.
 
 The app is built to work well out of the box on mobile devices and touch screens, but it also comes loaded with options and hotkeys.
 
@@ -16,13 +16,13 @@ The app is built to work well out of the box on mobile devices and touch screens
 
 ## Games
 
-PTN Ninja stores your games in a database on your device to allow easy switching between them using the Game Selector. Games you load will be stored until you close them using the Game Selector.
+Trakt stores your games in a database on your device to allow easy switching between them using the Game Selector. Games you load will be stored until you close them using the Game Selector.
 
-You can load games (or moves) from your clipboard, files, PTN Ninja links, or PlayTak Game IDs. To load from your clipboard, first copy one of the following:
+You can load games (or moves) from your clipboard, files, Trakt links, or PlayTak Game IDs. To load from your clipboard, first copy one of the following:
 
 - TPS
 - PTN (full game, or partial moves)
-- A PTN Ninja link
+- A Trakt link
 - [PlayTak game ID](https://www.playtak.com/games)
 - JSON copied from [TakBot's](https://github.com/humanat/takbot) `/info` command
 
@@ -36,7 +36,7 @@ Press <kbd>E</kbd> to edit the game metadata directly.
 
 - To load an existing game, press <kbd>L</kbd>, or **click** the **+** button in the lower-right corner, to open the Load Game dialog.
   - To quickly load one or more games from files, press <kbd>Ctrl</kbd><kbd>O</kbd>.
-  - To quickly load a game or branch from your clipboard, press <kbd>Ctrl</kbd><kbd>V</kbd> after copying TPS, full or partial PTN, a PTN Ninja link, a PlayTak game ID, or game JSON from TakBot.
+  - To quickly load a game or branch from your clipboard, press <kbd>Ctrl</kbd><kbd>V</kbd> after copying TPS, full or partial PTN, a Trakt link, a PlayTak game ID, or game JSON from TakBot.
 - To create a new game, press <kbd>N</kbd>, or **click** the **+** button in the lower-right corner, then select the New Game tab.
   - Or, **drag** one or more **.ptn** or **.txt** files into the window.
 - Use the Game Selector in the top toolbar, or hotkeys, to switch between games.
@@ -90,11 +90,11 @@ A followed game is an ordinary game in every other respect; you can annotate it,
 
 # The Board
 
-PTN Ninja's board offers a 2D representation of the 3D game. To accommodate large stacks, any pieces beyond the carry limit are displayed in a small stack to the right of the movable stack. Only the top 10 of these pieces are displayed, should a stack grow into a tower. In 3D mode, all pieces beyond the carry limit are displayed as normal, but translucent.
+Trakt's board offers a 2D representation of the 3D game. To accommodate large stacks, any pieces beyond the carry limit are displayed in a small stack to the right of the movable stack. Only the top 10 of these pieces are displayed, should a stack grow into a tower. In 3D mode, all pieces beyond the carry limit are displayed as normal, but translucent.
 
 ## Place a Stone
 
-PTN Ninja offers multiple modes of interaction for placing a stone. You may interact with the board directly, selecting an empty square multiple times to cycle the stone type, or you may select an un-played stone to determine its type before placing it.
+Trakt offers multiple modes of interaction for placing a stone. You may interact with the board directly, selecting an empty square multiple times to cycle the stone type, or you may select an un-played stone to determine its type before placing it.
 
 ::: tip
 
@@ -142,7 +142,7 @@ If you're using a keyboard and mouse, you can move stacks more efficiently:
 
 ## Playback
 
-PTN Ninja enables you to navigate the timeline of a game freely.
+Trakt enables you to navigate the timeline of a game freely.
 
 ::: tip
 
@@ -153,8 +153,8 @@ The Play/Pause button is hidden by default and can be shown via **UI Preferences
 :::
 
 - Use the Play/Pause button to automatically progress through the game.
-- Move backward and forward through the game history using the **Navigation Controls** or <kbd>◀/▶</kbd>.
-- **Right-click** the Back or Forward button to move by a **half-step** or use <kbd>Shift</kbd><kbd>◀/▶</kbd>.
+- Move backward and forward through the game history using the **Navigation Controls** or <kbd>в—Ђ/в–¶</kbd>.
+- **Right-click** the Back or Forward button to move by a **half-step** or use <kbd>Shift</kbd><kbd>в—Ђ/в–¶</kbd>.
 
 :::
 
@@ -171,7 +171,7 @@ To navigate through a game quickly, you can scrub using a **mouse wheel** or the
 
 ## Flip and Rotate
 
-PTN Ninja allows you to rotate and flip the orientation of the board, which may help reduce visual bias during analysis, or in getting a better view around tall stacks. This does not affect the notation, so the axis labels change accordingly.
+Trakt allows you to rotate and flip the orientation of the board, which may help reduce visual bias during analysis, or in getting a better view around tall stacks. This does not affect the notation, so the axis labels change accordingly.
 
 If you want to preserve a transformation, you can apply it to the game notation.
 
@@ -179,7 +179,7 @@ If you want to preserve a transformation, you can apply it to the game notation.
 
 - Use the Rotate and Flip button found next to the board (or hotkeys), to change the board orientation.
 - **Right-click** the Rotate/Flip button to reset the board orientation.
-- Rotate left, right, and 180° with <kbd>[</kbd>, <kbd>]</kbd> , and <kbd>-</kbd> respectively.
+- Rotate left, right, and 180В° with <kbd>[</kbd>, <kbd>]</kbd> , and <kbd>-</kbd> respectively.
 - Flip horizontally and vertically with <kbd>;</kbd> and <kbd>Shift</kbd><kbd>;</kbd> respectively.
 - Reset or apply the transformation with <kbd>=</kbd> or <kbd>Shift</kbd><kbd>+</kbd> respectively.
 
@@ -199,7 +199,7 @@ While 2D mode gives a more analytical view of the board, 3D mode offers some sem
 
 # PTN
 
-[PTN](https://ustak.org/portable-tak-notation/) is the notation that describes the moves of the game. PTN Ninja reads and writes information using this notation.
+[PTN](https://ustak.org/portable-tak-notation/) is the notation that describes the moves of the game. Trakt reads and writes information using this notation.
 
 ::: tip
 
@@ -215,7 +215,7 @@ You can insert moves with <kbd>Ctrl</kbd><kbd>V</kbd> after copying partial PTN.
 
 :::
 
-Though the UI should provide for most of your PTN editing needs, PTN Ninja also offers an interactive PTN notation editor.
+Though the UI should provide for most of your PTN editing needs, Trakt also offers an interactive PTN notation editor.
 
 :::
 
@@ -226,11 +226,11 @@ Though the UI should provide for most of your PTN editing needs, PTN Ninja also 
 
 ## Branches
 
-PTN Ninja records multiple lines of play, called "branches." The PTN panel offers three display modes:
+Trakt records multiple lines of play, called "branches." The PTN panel offers three display modes:
 
-- **Current Branch** — Shows only the current line of play (default).
-- **Inline Branches** — Shows all branches inline, with collapsible branch points.
-- **All Branches** — Shows all branches in a tree structure with indentation.
+- **Current Branch** вЂ” Shows only the current line of play (default).
+- **Inline Branches** вЂ” Shows all branches inline, with collapsible branch points.
+- **All Branches** вЂ” Shows all branches in a tree structure with indentation.
 
 ::: tip
 
@@ -244,19 +244,19 @@ You can perform several actions on branches by **right-clicking** the branch nam
   - To toggle quickly between showing and hiding branches, **right-click** this button.
 - **Click** the 'branch' menu in the bottom toolbar, or press <kbd>B</kbd>, to see the list of all branches.
   - This button is highlighted when not on the main branch.
-- Use <kbd>▲/▼</kbd> to navigate between branches.
-  - When the branch menu (<kbd>B</kbd>) is open, <kbd>▲/▼</kbd> navigates between all branches.
-  - When the branch menu is closed, <kbd>▲/▼</kbd> will not allow jumps between unrelated branches.
-  - <kbd>Shift</kbd><kbd>▲/▼</kbd> jumps to the first or last branch within related branches.
-  - <kbd>Ctrl</kbd><kbd>▲</kbd> jumps to the main branch.
-  - In "Inline Branches" mode, <kbd>▲</kbd> can also be used to collapse the current branch at its parent ply.
+- Use <kbd>в–І/в–ј</kbd> to navigate between branches.
+  - When the branch menu (<kbd>B</kbd>) is open, <kbd>в–І/в–ј</kbd> navigates between all branches.
+  - When the branch menu is closed, <kbd>в–І/в–ј</kbd> will not allow jumps between unrelated branches.
+  - <kbd>Shift</kbd><kbd>в–І/в–ј</kbd> jumps to the first or last branch within related branches.
+  - <kbd>Ctrl</kbd><kbd>в–І</kbd> jumps to the main branch.
+  - In "Inline Branches" mode, <kbd>в–І</kbd> can also be used to collapse the current branch at its parent ply.
 - **Right-click** a branch or use the menu button to **promote**, **rename**, or **delete** it.
 
 :::
 
 ## Trimming
 
-PTN Ninja provides a few automated tools for removing irrelevant information:
+Trakt provides a few automated tools for removing irrelevant information:
 
 :::
 
@@ -288,7 +288,7 @@ TPS edit mode is available only for games with no plies.
 
 ## Notes
 
-One feature of PTN is support for comments. PTN Ninja provides a chat-like interface for creating, editing, and viewing these comments or notes.
+One feature of PTN is support for comments. Trakt provides a chat-like interface for creating, editing, and viewing these comments or notes.
 
 ::: tip
 
@@ -309,18 +309,18 @@ Notes support Markdown formatting. While typing in the note input, the following
 
 :::
 
-- <kbd>Ctrl</kbd><kbd>B</kbd> — **bold**
-- <kbd>Ctrl</kbd><kbd>I</kbd> — _italic_
-- <kbd>Ctrl</kbd><kbd>U</kbd> — underline
-- <kbd>Ctrl</kbd><kbd>E</kbd> — `code`
-- <kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>X</kbd> — ~~strikethrough~~
+- <kbd>Ctrl</kbd><kbd>B</kbd> вЂ” **bold**
+- <kbd>Ctrl</kbd><kbd>I</kbd> вЂ” _italic_
+- <kbd>Ctrl</kbd><kbd>U</kbd> вЂ” underline
+- <kbd>Ctrl</kbd><kbd>E</kbd> вЂ” `code`
+- <kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>X</kbd> вЂ” ~~strikethrough~~
 - Pasting a URL while text is selected wraps the selection as a link.
 
 :::
 
 # Analysis
 
-Thanks to the [Tak Community](https://discord.gg/2xEt42X), PTN Ninja now offers several analysis features, including **engine analysis** and an **opening explorer**.
+Thanks to the [Tak Community](https://discord.gg/2xEt42X), Trakt now offers several analysis features, including **engine analysis** and an **opening explorer**.
 
 :::
 
@@ -330,16 +330,16 @@ To quickly switch between Notes and Analysis, press <kbd>Shift</kbd><kbd>W</kbd>
 
 ## Engine Analysis
 
-PTN Ninja offers two built-in engines: **Tiltak (wasm)** for general positional evaluation, and the **Tinuë Solver (wasm)** for forced-road (Tinuë) search. It also supports connecting to any engine that uses **TEI** via websockets, using a bridge like [websocketd](http://websocketd.com/). Due to the inherent differences in these engines and how they interact with PTN Ninja, they offer different advantages:
+Trakt offers two built-in engines: **Tiltak (wasm)** for general positional evaluation, and the **TinuГ« Solver (wasm)** for forced-road (TinuГ«) search. It also supports connecting to any engine that uses **TEI** via websockets, using a bridge like [websocketd](http://websocketd.com/). Due to the inherent differences in these engines and how they interact with Trakt, they offer different advantages:
 
 - [Tiltak (wasm)](https://github.com/MortenLohne/tiltak-wasm)
   - runs on this device
-  - built into PTN Ninja
+  - built into Trakt
   - used to check positions for road threats
-- [Tinuë Solver (wasm)](https://github.com/gruppler/syntaks/tree/tinue-solver)
+- [TinuГ« Solver (wasm)](https://github.com/gruppler/syntaks/tree/tinue-solver)
   - runs on this device
-  - built into PTN Ninja
-  - dedicated Tinuë solver
+  - built into Trakt
+  - dedicated TinuГ« solver
   - built on [syntaks](https://github.com/Ciekce/syntaks) by [Ciekce](https://github.com/Ciekce)
 - [TEI](https://github.com/MortenLohne/racetrack?tab=readme-ov-file#tei)
   - can run on any network-accessible device
@@ -348,13 +348,13 @@ PTN Ninja offers two built-in engines: **Tiltak (wasm)** for general positional 
 
 ::: info Note
 
-Both built-in wasm engines are activated by default. They can be removed from the active engines list at any time (like any other engine) and re-added via "Add Engine" — your choice is remembered across reloads.
+Both built-in wasm engines are activated by default. They can be removed from the active engines list at any time (like any other engine) and re-added via "Add Engine" вЂ” your choice is remembered across reloads.
 
 :::
 
 ### Connecting a TEI Engine
 
-To use a TEI engine with PTN Ninja, you'll need [websocketd](http://websocketd.com/) to bridge the engine's standard I/O to WebSocket.
+To use a TEI engine with Trakt, you'll need [websocketd](http://websocketd.com/) to bridge the engine's standard I/O to WebSocket.
 
 :::
 
@@ -364,7 +364,7 @@ To use a TEI engine with PTN Ninja, you'll need [websocketd](http://websocketd.c
 
    To allow connections from other devices, add `--address=0.0.0.0`.
 
-3. In PTN Ninja, select the TEI engine and click the cog icon to show its settings.
+3. In Trakt, select the TEI engine and click the cog icon to show its settings.
 4. Under address, enter `127.0.0.1` if connecting from the same device, or the IP address of the device running the engine if connecting from another device on the same network.
 5. Set the port to match the port used in step 2.
 6. Make sure SSL is disabled.
@@ -410,7 +410,7 @@ You can add multiple engines to analyze positions in parallel. Each engine runs 
 - Engines can be reordered from each engine's menu, either one step at a time with "Move Up"/"Move Down" or straight to either end with "Move to Top"/"Move to Bottom."
 - To remove an engine, **click** the menu icon and select "Remove."
 - Press <kbd>V</kbd> to toggle analysis visualizations.
-- Press <kbd>Shift</kbd><kbd>V</kbd> to toggle all analysis visuals together — the board visualizations, evaluation bars, and evaluation marks.
+- Press <kbd>Shift</kbd><kbd>V</kbd> to toggle all analysis visuals together вЂ” the board visualizations, evaluation bars, and evaluation marks.
 - **Hover** over a ply within a PV to preview the resulting board position as a thumbnail. If the ply has a continuation, a navigation control appears beneath the thumbnail showing the current move.
 - While previewing, step the thumbnail through the continuation one ply at a time using the **back/forward buttons** in the preview, or the **scroll wheel** over the ply (when scroll navigation is enabled). The preview is cumulative, showing the position after each successive ply of the PV.
 - On a touchscreen, **long-press** a ply to show the preview, and **drag horizontally** across a ply within a PV to step through its continuation.
@@ -500,7 +500,7 @@ The PTN panel's toolbar writes marks directly onto the current ply in the PTN. T
 :::
 
 - The `?` and `!` buttons toggle evaluation marks. **Left-click** for the single mark, **right-click** for the double.
-- The Tak/Tinuë button toggles `'` (Tak) with **left-click** or <kbd>'</kbd>, and `"` (Tinuë) with **right-click** or <kbd>Shift</kbd><kbd>"</kbd>.
+- The Tak/TinuГ« button toggles `'` (Tak) with **left-click** or <kbd>'</kbd>, and `"` (TinuГ«) with **right-click** or <kbd>Shift</kbd><kbd>"</kbd>.
 - **Auto-Mark Tak**, at the left of the group, marks all existing tak threats and keeps marking new ones as moves are played.
 
 :::
@@ -519,7 +519,7 @@ Engines produce evaluation marks of their own, which are kept separately from th
 
 ::: info Note
 
-While "Engine Evaluation Marks" is enabled, an available analysis mark is displayed **in place of** the ply's own `?` or `!`. Your manual mark is not overwritten; turn the setting off to see it again. Tak and Tinuë marks always show either way.
+While "Engine Evaluation Marks" is enabled, an available analysis mark is displayed **in place of** the ply's own `?` or `!`. Your manual mark is not overwritten; turn the setting off to see it again. Tak and TinuГ« marks always show either way.
 
 :::
 
@@ -544,41 +544,41 @@ Where an engine reported win/draw/loss probabilities, the graph uses those in pr
 
 :::
 
-### Tinuë Search
+### TinuГ« Search
 
-The **Tinuë Solver (wasm)** is dedicated to finding Tinuë. It runs alongside other engines and uses the same Analyze Position/Branch/Game controls.
+The **TinuГ« Solver (wasm)** is dedicated to finding TinuГ«. It runs alongside other engines and uses the same Analyze Position/Branch/Game controls.
 
 :::
 
-- Set "Depth" in the engine settings to cap per-position search depth (odd values ≥ 3). The default finds most Tinuës; lowering it trades finding the longer ones for speed.
+- Set "Depth" in the engine settings to cap per-position search depth (odd values в‰Ґ 3). The default finds most TinuГ«s; lowering it trades finding the longer ones for speed.
 - Set "Nodes" to cap the search per position. When a position exceeds the cap, the search is abandoned and the sweep moves on. Raising it resolves more positions, with diminishing returns.
 - "Analyze Game" and "Analyze Branch" iterate **backwards** from the end of the game, auto-following the board to each position. Full-game analysis covers the main branch first, then sub-branches.
-- Enable **Auto-Mark Tinuë** in the engine settings (cog icon) to have the engine write `"` marks into the PTN as it proves Tinuës.
+- Enable **Auto-Mark TinuГ«** in the engine settings (cog icon) to have the engine write `"` marks into the PTN as it proves TinuГ«s.
 
 :::
 
 ::: info Search scope
 
-Full-game/branch sweeps and one-shot position analysis search only moves that make a road threat. This "**strict**" search makes the search fast enough to be useful, and most Tinuës fit this profile (unbroken chains of road threats).
+Full-game/branch sweeps and one-shot position analysis search only moves that make a road threat. This "**strict**" search makes the search fast enough to be useful, and most TinuГ«s fit this profile (unbroken chains of road threats).
 
 **Interactive mode** runs the strict search first and then, if it completed without finding anything, continues into an unbounded search of every legal move for as long as you stay on the position.
 
 :::
 
-When a search proves no Tinuë, it produces no suggestions, so the verdict is shown in place of the results:
+When a search proves no TinuГ«, it produces no suggestions, so the verdict is shown in place of the results:
 
 :::
 
-- **"No strict tinuë"**: nothing found among road threats. A quiet Tinuë may still exist; interactive mode will keep looking.
-- **"No tinuë"**: the interactive extension searched every move and found nothing.
+- **"No strict tinuГ«"**: nothing found among road threats. A quiet TinuГ« may still exist; interactive mode will keep looking.
+- **"No tinuГ«"**: the interactive extension searched every move and found nothing.
 - **"Search incomplete"**: the node limit was reached before the position could be resolved. Raise the limit to search further.
-- **"Lost position"**: the side to move has no forced win because the _opponent_ does. Rather than report "no Tinuë", the engine searches every reply and lists the defenses that hold out longest, along with how each one eventually loses.
+- **"Lost position"**: the side to move has no forced win because the _opponent_ does. Rather than report "no TinuГ«", the engine searches every reply and lists the defenses that hold out longest, along with how each one eventually loses.
 
 :::
 
-### Finding the Tinuë Origin
+### Finding the TinuГ« Origin
 
-Once a Tinuë is proven, the engine can trace it back to the point where the win first became forced.
+Once a TinuГ« is proven, the engine can trace it back to the point where the win first became forced.
 
 :::
 
@@ -622,7 +622,7 @@ The **opening explorer** enables you to see the outcomes of [PlayTak games](http
 
 # Themes
 
-PTN Ninja offers a variety of built-in themes, but you can also create your own. You can select and edit themes using the Theme Selector found in both the **Board Preferences** and **UI Preferences**, or directly from the theme editor.
+Trakt offers a variety of built-in themes, but you can also create your own. You can select and edit themes using the Theme Selector found in both the **Board Preferences** and **UI Preferences**, or directly from the theme editor.
 
 :::
 

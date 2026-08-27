@@ -1,6 +1,6 @@
 export default {
   site_name: "Trakt",
-  app_title: "PTN Ninja",
+  app_title: "Trakt",
 
   About: "About",
   Account: "Account",

@@ -1,6 +1,6 @@
-# PTN Ninja E2E Tests
+# Trakt E2E Tests
 
-End-to-end tests for PTN Ninja using Playwright.
+End-to-end tests for Trakt using Playwright.
 
 ## Setup
 

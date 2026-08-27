@@ -310,7 +310,7 @@ export const IMPORT_FROM_CLIPBOARD = async function ({ dispatch, getters }) {
       });
       return false;
     } else if (/^https:\/\/ptn.ninja\/.+/.test(ptn)) {
-      // PTN Ninja url
+      // Upstream PTN Ninja share link
       let route = router.match(ptn.substring(17));
       if (route && route.name === "local") {
         if (!isEmpty(route.params)) {

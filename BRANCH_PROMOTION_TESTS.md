@@ -17,7 +17,7 @@ The goal is to detect cases where promotion:
 
 ## Automated runner (recommended)
 
-In development builds, PTN Ninja now installs an automated runner at:
+In development builds, Trakt now installs an automated runner at:
 
 - `window.branchPromotionTests`
 
@@ -41,7 +41,7 @@ window.branchPromotionTests.runCase("T10");
 
 If a test fails, it throws an error and prints a `console.table()` with results.
 
-These snippets assume you’re running PTN Ninja in the browser and have a game loaded.
+These snippets assume you’re running Trakt in the browser and have a game loaded.
 
 ```js
 const g = app.$store.state.game.ptn;

@@ -281,13 +281,13 @@ For example:
   - `time1` (`<Number>`): Remaining time for Player 1 in milliseconds
   - `time2` (`<Number>`): Remaining time for Player 2 in milliseconds
   - `timerTurn` (`1|2`): Which player's clock is currently counting down
-  - `lastTimeUpdateWall` (`<Number>`): Recommended. A wall-clock timestamp (`Date.now()`) taken when the clock values were measured. PTN Ninja uses it to compensate for `postMessage` transit delay, keeping the iframe's countdown in sync with the sender's clock.
-  - `lastTimeUpdate` (`<Number>`): Optional reference timestamp (from `performance.now()`). Only meaningful if the sender and PTN Ninja share the same `performance` timeline (rare across iframes). Ignored when `lastTimeUpdateWall` is provided. If neither is provided, PTN Ninja uses its own `performance.now()` at message receipt.
+- `lastTimeUpdateWall` (`<Number>`): Recommended. A wall-clock timestamp (`Date.now()`) taken when the clock values were measured. Trakt uses it to compensate for `postMessage` transit delay, keeping the iframe's countdown in sync with the sender's clock.
+- `lastTimeUpdate` (`<Number>`): Optional reference timestamp (from `performance.now()`). Only meaningful if the sender and Trakt share the same `performance` timeline (rare across iframes). Ignored when `lastTimeUpdateWall` is provided. If neither is provided, Trakt uses its own `performance.now()` at message receipt.
 - Does not by itself enable live countdown; send `SET_TIMER_LIVE` with `true` to start ticking.
 
 #### `SET_GAME_TIMER_TURN` (value: `1|2`)
 
-- Switch the active player clock. PTN Ninja will automatically subtract the elapsed time since the last update from the previously active player's clock. Useful after each move, before the next authoritative `SET_GAME_TIME` arrives.
+- Switch the active player clock. Trakt will automatically subtract the elapsed time since the last update from the previously active player's clock. Useful after each move, before the next authoritative `SET_GAME_TIME` arrives.
 
 #### `SET_NAME` (value: `<String>`)
 
@@ -335,7 +335,7 @@ For example:
 
 ### Outgoing Messages
 
-These messages are sent from PTN Ninja to its parent or opening window via `postMessage`.
+These messages are sent from Trakt to its parent or opening window via `postMessage`.
 
 - **`GAME_STATE`** (value: `<Object>`) — Sent whenever the game position changes. Includes `move`, `ply`, `prevPly`, `nextPly`, `flats`, and other position data.
 - **`INSERT_PLY`** (value: `<String>`) — Sent when a ply is inserted via user interaction on the board.
@@ -343,7 +343,7 @@ These messages are sent from PTN Ninja to its parent or opening window via `post
 
 #### `UNHANDLED_KEY` (value: `<Object>`)
 
-- Sent when a keyboard event occurs in embed mode that PTN Ninja does not handle. A key is considered unhandled when its corresponding feature is disabled via embed configuration (e.g. arrow keys when `disableNavigation` is `true`, since the navigation shortcut bindings are not active). The value contains the following key event properties:
+- Sent when a keyboard event occurs in embed mode that Trakt does not handle. A key is considered unhandled when its corresponding feature is disabled via embed configuration (e.g. arrow keys when `disableNavigation` is `true`, since the navigation shortcut bindings are not active). The value contains the following key event properties:
   - `key` (`<String>`): The key value (e.g. `"ArrowUp"`)
   - `code` (`<String>`): The physical key code (e.g. `"ArrowUp"`)
   - `keyCode` (`<Number>`): The numeric key code

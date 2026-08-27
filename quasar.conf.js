@@ -118,8 +118,8 @@ module.exports = function (ctx) {
         navigateFallback: `${deployBase}index.html`,
       },
       manifest: {
-        name: "PTN Ninja",
-        short_name: "PTN-Ninja",
+        name: "Trakt",
+        short_name: "Trakt",
         description: "An editor and viewer for Portable Tak Notation",
         display: "standalone",
         // orientation: "any",

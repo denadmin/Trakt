@@ -1,7 +1,7 @@
 {
-  "name": "ptn-ninja-tests",
+  "name": "trakt-tests",
   "version": "1.0.0",
-  "description": "E2E tests for PTN Ninja",
+  "description": "E2E tests for Trakt",
   "scripts": {
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui",

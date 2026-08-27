@@ -19,7 +19,7 @@ export const PLAYTAK_API_BASE_URL = process.env.PLAYTAK_USE_PROXY
 
 const PLAYTAK_WS_URL = `wss://${PLAYTAK_WS_HOST}/ws`;
 const PLAYTAK_WS_PROTOCOL = "binary";
-const PLAYTAK_CLIENT_NAME = "PTN Ninja";
+const PLAYTAK_CLIENT_NAME = "Trakt";
 const PLAYTAK_START_TIMEOUT_MS = 15000;
 const PLAYTAK_KEEPALIVE_MS = 25000;
 // Quiet-period threshold used when observing an ongoing game that is

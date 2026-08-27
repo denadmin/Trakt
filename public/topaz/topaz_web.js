@@ -196,7 +196,7 @@ let wasm_bindgen = (function(exports) {
     exports.TopazEngine = TopazEngine;
 
     /**
-     * One-shot analysis helper matching the interface expected by PTN Ninja's
+     * One-shot analysis helper matching the interface expected by Trakt's
      * worker: search a TPS position for `depth` plies within `movetime_secs`
      * seconds and return a single line in TEI-ish format:
      * `info depth {d} score cp {cp} nodes {n} pv {moves...}`.
@@ -224,7 +224,7 @@ let wasm_bindgen = (function(exports) {
     exports.evaluate = evaluate;
 
     /**
-     * One-shot multi-PV analysis matching the interface expected by PTN Ninja's
+     * One-shot multi-PV analysis matching the interface expected by Trakt's
      * worker: search a TPS position for `depth` plies within `movetime_secs`
      * seconds and return up to `num_pvs` lines, one per `info` line:
      * `info depth {d} multipv {i} score cp {cp} nodes {n} pv {moves...}`.

@@ -221,7 +221,7 @@ const appendPlaytakLivePly = (game, plyText, liveSync, takMark = false) => {
   //   - carry/distribution defaulting (PlayTak sends "1e5-1",
   //     Ply.text emits "e5-")
   //   - wall-smash markers (PlayTak's M command never includes the
-  //     `*`, but PTN-Ninja appends one during insertion when a
+  //     `*`, but Trakt appends one during insertion when a
   //     capstone flattens a standing stone)
   // Direct .text comparison would spuriously mismatch in either case.
 

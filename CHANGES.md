@@ -1,6 +1,6 @@
 # Changes relative to upstream PTN-Ninja (v3.6.2)
 
-This fork targets a fully **offline, self-hosted** PTN Ninja that can be
+This fork targets a fully **offline, self-hosted** Trakt that can be
 installed as a PWA and deployed to GitHub Pages (or any static host).
 
 ## Features

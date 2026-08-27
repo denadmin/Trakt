@@ -4,7 +4,7 @@ const { test, expect } = require("@playwright/test");
 /**
  * Branch Promotion E2E Tests
  *
- * These tests verify that branch promotion operations work correctly in PTN Ninja.
+ * These tests verify that branch promotion operations work correctly in Trakt.
  * They use the existing branchPromotionRunner that's installed in development builds.
  */
 
