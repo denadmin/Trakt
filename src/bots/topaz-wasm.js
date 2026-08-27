@@ -218,12 +218,16 @@ export default class TopazWasm extends Bot {
     if (this.worker && this.state.isRunning) {
       try {
         await this.worker.terminate();
-        this.onTerminate(state);
         this.worker = null;
         this.init();
       } catch (error) {
         this.onError(error);
       }
     }
+    // Always run onTerminate, even when the engine is idle. The interactive
+    // stream goes idle (isRunning false) after a completed pass while still
+    // "enabled", and without this the cancel path would never clear
+    // isInteractiveEnabled — leaving the toolbar stuck in interactive mode.
+    this.onTerminate(state);
   }
 }
