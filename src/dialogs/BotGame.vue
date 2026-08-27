@@ -46,9 +46,9 @@
           dense
         />
         <q-select
-          v-model="humanPlayer"
+          v-model="botColor"
           :options="sides"
-          :label="$t('Play as')"
+          :label="$t('Bot plays as')"
           emit-value
           map-options
           dense
@@ -94,14 +94,16 @@ export default {
         { label: "6 × 6", value: 6 },
       ],
       komi: Number(this.$store.state.ui.komi) || 0,
-      // When continuing from a position, default the human to the side to
-      // move so they get the first move; pick the other side to hand the
-      // first move to the bot. Computed inline because Vue initializes
-      // `data` before `computed`.
-      humanPlayer:
+      // The field represents the bot's color directly (1=White, 2=Black),
+      // so selecting "Black" means the bot is Black and the human is White.
+      // For a new game default the bot to Black; for continue mode, default
+      // the bot to the side NOT to move so the human (the side to move)
+      // goes first. Computed inline because Vue initializes `data` before
+      // `computed`.
+      botColor:
         this.$route.query.continue === "1"
-          ? Number(this.$store.state.game.position.turn) || 1
-          : 1,
+          ? 3 - (Number(this.$store.state.game.position.turn) || 1) || 2
+          : 2,
       sides: [
         { label: "White", value: 1 },
         { label: "Black", value: 2 },
@@ -116,6 +118,12 @@ export default {
       const config = this.$store.state.game.config || {};
       return !!config.bot;
     },
+    humanPlayer() {
+      return 3 - this.botColor;
+    },
+    botPlayer() {
+      return this.botColor;
+    },
   },
   methods: {
     cancel() {
@@ -128,8 +136,8 @@ export default {
       const size = Number(this.size) || 6;
       const komi = Number(this.komi) || 0;
       const bot = this.engine;
-      const humanPlayer = Number(this.humanPlayer) || 1;
-      const botPlayer = humanPlayer === 1 ? 2 : 1;
+      const botPlayer = this.botPlayer;
+      const humanPlayer = this.humanPlayer;
       const botLabel = bot === "topaz" ? "Topaz" : "Tiltak";
       const humanLabel = humanPlayer === 1 ? "White" : "Black";
 
@@ -161,8 +169,8 @@ export default {
     },
     continueStart() {
       const bot = this.engine;
-      const humanPlayer = Number(this.humanPlayer) || 1;
-      const botPlayer = humanPlayer === 1 ? 2 : 1;
+      const botPlayer = this.botPlayer;
+      const humanPlayer = this.humanPlayer;
       this.$store.dispatch("game/SET_BOT", {
         bot,
         botPlayer,
