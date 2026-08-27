@@ -143,7 +143,7 @@ export default {
           komi: Number(komi),
           site: this.$t("site_name"),
         },
-        config: { bot, botPlayer },
+        config: { bot, botPlayer, player: humanPlayer },
       });
 
       this.$store.dispatch("game/ADD_GAME", game).then(() => {
@@ -163,7 +163,11 @@ export default {
       const bot = this.engine;
       const humanPlayer = Number(this.humanPlayer) || 1;
       const botPlayer = humanPlayer === 1 ? 2 : 1;
-      this.$store.dispatch("game/SET_BOT", { bot, botPlayer });
+      this.$store.dispatch("game/SET_BOT", {
+        bot,
+        botPlayer,
+        player: humanPlayer,
+      });
       this.$router.replace({ name: "local" });
     },
     stopBot() {

@@ -1332,13 +1332,15 @@ export const SET_PLAYER = function ({ commit }, player) {
 };
 
 // Attach a local bot opponent (engine id + which side the bot plays) to the
-// current game. Unlike the Play vs Bot dialog's "new game" path, this
-// continues the open game from wherever the user is currently looking.
+// current game. `player` is the human side, so the board only lets the human
+// interact on their own turns. Unlike the Play vs Bot dialog's "new game"
+// path, this continues the open game from wherever the user is currently
+// looking.
 export const SET_BOT = function (
   { commit, dispatch },
-  { bot, botPlayer } = {}
+  { bot, botPlayer, player } = {}
 ) {
-  commit("SET_BOT", { bot, botPlayer });
+  commit("SET_BOT", { bot, botPlayer, player });
   dispatch("SAVE_CURRENT_GAME", true);
 };
 
