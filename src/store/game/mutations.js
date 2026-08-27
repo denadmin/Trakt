@@ -714,6 +714,36 @@ export const SET_TIMER_LIVE = (state, live) => {
   state.config = { ...state.config, ...update };
 };
 
+// Attach (or detach, when `clear`) a local bot opponent to the current game.
+// Mirrors game.config into state.config and the game's list entry so the
+// toolbar and BotOpponent react to the change.
+export const SET_BOT = (state, { bot, botPlayer, clear = false } = {}) => {
+  const game = Vue.prototype.$game;
+  if (game) {
+    const next = { ...game.config };
+    if (clear) {
+      delete next.bot;
+      delete next.botPlayer;
+    } else {
+      next.bot = bot;
+      next.botPlayer = botPlayer;
+    }
+    game.config = next;
+    const stateGame = state.list.find((g) => g.name === game.name);
+    if (stateGame) {
+      stateGame.config = { ...game.config };
+    }
+  }
+  if (clear) {
+    const nextState = { ...state.config };
+    delete nextState.bot;
+    delete nextState.botPlayer;
+    state.config = nextState;
+  } else {
+    state.config = { ...state.config, bot, botPlayer };
+  }
+};
+
 export const SET_GAME_TIMER_TURN = function (state, turn) {
   if (!state.config) return;
   const now = performance.now();

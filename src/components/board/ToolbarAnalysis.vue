@@ -275,6 +275,24 @@
         </q-btn>
       </template>
 
+      <!-- Play vs Bot (continue current game) -->
+      <q-btn
+        v-if="!isEmbedded"
+        @click="playVsBot"
+        @click.right.prevent.stop="stopBot"
+        :icon="botActive ? 'bot_on' : 'bot'"
+        :class="['dimmed-btn', { 'bot-active': botActive }]"
+        v-ripple="false"
+        :color="botActive ? 'primary' : btnColor"
+        :disable="isGameEnd"
+        dense
+        flat
+      >
+        <hint>
+          {{ botActive ? $t("analysis.playingVsBot") : $t("Play vs Bot") }}
+        </hint>
+      </q-btn>
+
       <!-- Bot Selector -->
       <q-btn
         v-if="!isEmbedded"
@@ -562,6 +580,10 @@ export default {
     },
     isEmbedded() {
       return this.$store.state.ui.embed;
+    },
+    botActive() {
+      const config = this.$store.state.game.config || {};
+      return !!config.bot;
     },
     icon() {
       return this.collapsed ? "up" : "down";
@@ -975,6 +997,12 @@ export default {
       if (bot && bot.isInteractiveAvailable) {
         bot.isInteractiveEnabled = !bot.isInteractiveEnabled;
       }
+    },
+    playVsBot() {
+      this.$router.push({ name: "bot-game", query: { continue: "1" } });
+    },
+    stopBot() {
+      this.$store.dispatch("game/STOP_BOT");
     },
     analyzePosition() {
       const bot = this.ensureEngineSelected();

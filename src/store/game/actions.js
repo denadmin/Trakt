@@ -1346,6 +1346,23 @@ export const SET_PLAYER = function ({ commit }, player) {
   }
 };
 
+// Attach a local bot opponent (engine id + which side the bot plays) to the
+// current game. Unlike the Play vs Bot dialog's "new game" path, this
+// continues the open game from wherever the user is currently looking.
+export const SET_BOT = function (
+  { commit, dispatch },
+  { bot, botPlayer } = {}
+) {
+  commit("SET_BOT", { bot, botPlayer });
+  dispatch("SAVE_CURRENT_GAME", true);
+};
+
+// Detach the bot opponent from the current game.
+export const STOP_BOT = function ({ commit, dispatch }) {
+  commit("SET_BOT", { clear: true });
+  dispatch("SAVE_CURRENT_GAME", true);
+};
+
 // Persist the analysis selection (source, botID, savedBotName,
 // preferSavedResults) into the current game's config so it is restored when
 // the game is loaded again. Called (throttled) from analysis/SET.
