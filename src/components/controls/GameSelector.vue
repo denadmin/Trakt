@@ -271,17 +271,6 @@ export default {
     },
   },
   methods: {
-    account() {
-      const user = this.$store.state.online.user;
-      const player = this.games[0].config.player;
-      if (!player) {
-        this.$router.push({ name: "join" });
-      } else if (user && !user.isAnonymous) {
-        this.$router.push({ name: "account" });
-      } else {
-        this.$router.push({ name: "login" });
-      }
-    },
     statusIconClick() {
       if (this.isPlaytakSelected && !this.isPlaytakConnected) {
         this.isPlaytakConnecting = true;
@@ -293,8 +282,6 @@ export default {
           })
           .catch((error) => this.notifyError(error, { position: "top-left" }))
           .finally(() => (this.isPlaytakConnecting = false));
-      } else if (this.config.isOnline) {
-        this.account(); // TODO: Decide what should actually happen here
       }
     },
     select(index) {

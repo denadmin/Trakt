@@ -38,7 +38,30 @@ installed as a PWA and deployed to GitHub Pages (or any static host).
 - The in-app changelog / "Check for updates" UI was removed (it targeted the
   hosted ptn.ninja release pipeline).
 - `.github/workflows/deploy.yml` builds the PWA and publishes it to GitHub
-  Pages on every push to `master`.
+  Pages on every push to `master`, and now also runs the Playwright e2e suite
+  in a separate `test` job.
+
+## Offline / local-run cleanup
+
+- **Accounts & online games removed.** The `online` Vuex module, the Firebase
+  boot file, the auth dialogs (`LogIn`, `Account`, `JoinGame`, `ShareOnline`),
+  `pages/Auth.vue`, the online games table and the `auth`/`account`/`join`/
+  `login` routes are gone. No Firebase config is required anywhere.
+- **Firebase scaffolding deleted.** `functions/`, `firebase.json`,
+  `firestore.rules`, `firestore.indexes.json`, `database.rules.json`,
+  `firebase-messaging-sw.js`, `.firebaserc` and the `deploy*`/`emulate`
+  scripts were removed, along with the `firebase`/`firebase-admin`/
+  `firebase-tools` dependencies.
+- **Remote share services removed.** The short-link service
+  (`url.ptn.ninja`/`SHORTENER_SERVICE`), the `/s/:id` route and the GIF/PNG
+  server endpoints (`tps.ptn.ninja`) are gone; the "Short Link" share action
+  and QR-code short option were dropped. GIF/PNG export renders fully in the
+  browser.
+- **Cross-platform scripts.** `dev`/`build` (and `*:electron`) scripts now use
+  `cross-env` to set `NODE_OPTIONS=--openssl-legacy-provider`, so
+  `yarn dev`/`yarn build` work on Linux/macOS as well as Windows.
+- `readme.md` was rewritten for the offline scenario (no Firebase
+  prerequisite, no `yarn emulate`, no `url.ptn.ninja/short` API).
 
 ## Local development
 

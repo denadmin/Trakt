@@ -30,8 +30,6 @@
           @share="share"
           @settings="settings"
           @help="help"
-          @check-updates="checkForUpdates"
-          @changelog="changelog"
         />
 
         <!-- Right Drawer Toggle -->
@@ -314,7 +312,6 @@ import ShareButton from "../components/controls/ShareButton";
 import ToolbarAnalysis from "../components/board/ToolbarAnalysis";
 
 // Excluded from Embed layout:
-// import onlineStore from "../store/online";
 import analysisStore from "../store/analysis";
 import GameSelector from "../components/controls/GameSelector";
 import MainMenu from "../components/controls/MainMenu";
@@ -324,7 +321,6 @@ import Chat from "../components/drawers/Chat";
 
 import Game from "../Game";
 import { HOTKEYS } from "../keymap";
-import { shouldShowChangelogAfterUpdate } from "../utils/changelog";
 
 import { Platform } from "quasar";
 
@@ -362,7 +358,6 @@ export default {
       doubleWidth: 1025,
       singleWidth: this.$q.screen.sizes.sm,
       showTabSettings: false,
-      changelogChecked: false,
     };
   },
   computed: {
@@ -453,18 +448,6 @@ export default {
     },
     games() {
       return this.$store.state.game.list;
-    },
-    user() {
-      return null;
-      // return this.$store.state.online.user;
-    },
-    player() {
-      return this.user
-        ? this.$store.getters["online/playerFromUID"](this.user.uid)
-        : 0;
-    },
-    isAnonymous() {
-      return !this.user || this.user.isAnonymous;
     },
     tabStatsEngines() {
       const analysis = this.$store.state.analysis;
@@ -588,8 +571,6 @@ export default {
             }
           }
         }
-
-        this.maybeShowChangelog();
       }
     },
     clickNotification(event) {
@@ -777,21 +758,6 @@ export default {
             this.$refs.dialog.$children[0].hide();
           }
           break;
-        case "account":
-          if (this.isAnonymous) {
-            if (this.$route.name !== "login") {
-              this.$router.push({ name: "login" });
-            } else {
-              this.$refs.dialog.$children[0].hide();
-            }
-          } else {
-            if (this.$route.name !== "account") {
-              this.$router.push({ name: "account" });
-            } else {
-              this.$refs.dialog.$children[0].hide();
-            }
-          }
-          break;
         case "hotkeys":
           if (this.$route.name !== "help") {
             this.$router.push({
@@ -822,24 +788,6 @@ export default {
             this.$refs.dialog.$children[0].hide();
           }
           break;
-        case "loadOnlineGame":
-          if (this.$route.name !== "add") {
-            this.$router.push({
-              name: "add",
-              params: { tab: "load", type: "online" },
-            });
-          } else if (
-            this.$route.params.tab !== "load" ||
-            !this.$route.params.online
-          ) {
-            this.$router.replace({
-              name: "add",
-              params: { tab: "load", type: "online" },
-            });
-          } else {
-            this.$refs.dialog.$children[0].hide();
-          }
-          break;
         case "newGame":
           if (this.$route.name !== "add") {
             this.$router.push({
@@ -851,13 +799,6 @@ export default {
               name: "add",
               params: { tab: "new" },
             });
-          } else {
-            this.$refs.dialog.$children[0].hide();
-          }
-          break;
-        case "online":
-          if (this.$route.name !== "online") {
-            this.$router.push({ name: "online" });
           } else {
             this.$refs.dialog.$children[0].hide();
           }
@@ -920,13 +861,6 @@ export default {
     addGame() {
       this.$router.push({ name: "add", params: { tab: "load" } });
     },
-    account() {
-      if (this.isAnonymous) {
-        this.$router.push({ name: "login" });
-      } else {
-        this.$router.push({ name: "account" });
-      }
-    },
     info() {
       this.$router.push({ name: "info-view" });
     },
@@ -944,64 +878,6 @@ export default {
     },
     help() {
       this.$router.push({ name: "help", params: { section: "usage" } });
-    },
-    changelog() {
-      // Changelog removed for the offline fork.
-    },
-    // Open the changelog once per load when the app has updated since the
-    // user last read it. Called at the end of init(), by which point getGame()
-    // has already replaced a shared game URL with "/", so the push can't
-    // discard one. Only from the board route itself: dialog paths are
-    // absolute, so pushing one over a deep link would drop that URL, and
-    // pushing rather than replacing leaves the dialog's go-back close landing
-    // back where the app started.
-    maybeShowChangelog() {
-      if (this.changelogChecked) {
-        return;
-      }
-      this.changelogChecked = true;
-      if (this.$route.name !== "local") {
-        return;
-      }
-      if (
-        shouldShowChangelogAfterUpdate({
-          showAfterUpdate: this.$store.state.ui.showChangelogAfterUpdate,
-        })
-      ) {
-        this.changelog();
-      }
-    },
-    async checkForUpdates() {
-      if (!navigator.serviceWorker) {
-        return this.notifyError("updateCheckUnsupported");
-      }
-
-      // Held open for the duration of the check; the outcome replaces it.
-      const dismissProgress = this.notifyHint("checkingForUpdates", {
-        icon: "update",
-        timeout: 0,
-      });
-
-      try {
-        const registration = await navigator.serviceWorker.getRegistration();
-        if (!registration) {
-          return this.notifyError("updateCheckUnsupported");
-        }
-
-        await registration.update();
-
-        // A new worker downloading or already waiting means an update was
-        // found; register-service-worker's updated() hook announces it, so
-        // stay quiet here and only speak up when there's nothing new.
-        if (!registration.installing && !registration.waiting) {
-          this.notifySuccess("upToDate");
-        }
-      } catch (error) {
-        console.error("Update check failed:", error);
-        this.notifyError("updateCheckFailed");
-      } finally {
-        dismissProgress();
-      }
     },
     switchGame() {
       if (this.$store.state.game.list.length > 1) {
@@ -1027,20 +903,6 @@ export default {
     gamesInitialized() {
       this.init();
     },
-    // game() {
-    //   this.$store.dispatch("online/LISTEN_CURRENT_GAME");
-    // },
-    user(user, oldUser) {
-      if (
-        this.isOnline &&
-        user &&
-        (!oldUser || user.uid !== oldUser.uid) &&
-        !this.$store.getters["online/playerFromUID"](user.uid) &&
-        this.$store.getters["online/openPlayer"]
-      ) {
-        this.$router.push({ name: "join" });
-      }
-    },
     hasChat(hasChat) {
       if (!hasChat && this.textTab === "chat") {
         this.textTab = "notes";
@@ -1048,12 +910,6 @@ export default {
     },
   },
   beforeCreate() {
-    // Load online functionality
-    // if (process.env.DEV && this.$store.state.online) {
-    //   this.$store.unregisterModule("online");
-    // }
-    // this.$store.registerModule("online", onlineStore);
-
     // Load analysis functionality
     if (process.env.DEV && this.$store.state.analysis) {
       this.$store.unregisterModule("analysis");
@@ -1075,29 +931,6 @@ export default {
       location.reload();
       return;
     }
-
-    // Initialize
-    // this.$store.dispatch("online/INIT").then(() => {
-    //   if (this.gameID) {
-    //     // Check that the game is not already open
-    //     const index = this.$store.state.game.list.findIndex(
-    //       (game) => game.config.id === this.gameID
-    //     );
-    //     if (index >= 0) {
-    //       this.$store.dispatch("game/SELECT_GAME", index);
-    //     } else {
-    //       // Add online game from URL
-    //       this.$store
-    //         .dispatch("online/LOAD_GAME", this.gameID)
-    //         .then(() => {
-    //           this.$router.replace("/");
-    //         })
-    //         .catch((error) => {
-    //           this.notifyError(error);
-    //         });
-    //     }
-    //   }
-    // });
   },
   mounted() {
     this.init();

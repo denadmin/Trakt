@@ -72,7 +72,6 @@ const defaultState = {
   showAnalysisBoard: true,
   showBoardPrefsBtn: false,
   showBoardTransformBtn: false,
-  showChangelogAfterUpdate: true,
   showControls: true,
   showEval: true,
   showHeader: true,
@@ -197,7 +196,6 @@ const state = {
   plyPreviewActive: false,
   branchMenuOpen: false,
   thumbnails: {},
-  shortLinks: {},
   defaults: defaultState,
   ...cloneDeep(defaultState),
 };

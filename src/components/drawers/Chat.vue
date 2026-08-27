@@ -111,10 +111,9 @@ export default {
       );
     },
     player() {
-      const user = this.$store.state.online.user;
-      return !this.game.config.isOnline || !user
-        ? this.game.position.turn
-        : this.game.config.player;
+      // The online player store was removed from this offline fork; the chat
+      // input is tied to the side to move.
+      return this.game.position.turn;
     },
     time() {
       return this.game.ptn.tags.datetime;

@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 module.exports = function (ctx) {
-  // Expose the app version (from package.json) so the client can drive the
-  // in-app changelog / "What's New" dialog and version tracking.
+  // Expose the app version (from package.json) so the client can display it
+  // (e.g. in the Help dialog).
   const appVersion = JSON.parse(
     fs.readFileSync(path.join(__dirname, "package.json"), "utf-8")
   ).version;

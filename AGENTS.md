@@ -3,17 +3,18 @@
 Ongoing notes for agent sessions on this fork.
 
 ## Repo & deploy
-- Source repo: `C:\src\tak\bots\topaz_tak\web\ninja-src` (git remote `origin` = upstream `gruppler/PTN-Ninja`, `fork` = our `denadmin/Trakt`).
+- Source repo: this `ninja-src` directory (git remote `origin` = upstream `gruppler/PTN-Ninja`, `fork` = our `denadmin/Trakt`).
 - **GitHub Pages:** https://denadmin.github.io/Trakt/ — published from `master` by `.github/workflows/deploy.yml` (build + deploy on every push).
 - CI uses `DEPLOY_BASE=/${{ github.event.repository.name }}/`. So if the repo is renamed, the URL/paths change automatically — no code change needed.
 
 ## Build / deploy workflow (local)
 
-1. Sync source into the build dir that has node_modules (robocopy `/MIR`, excluding `node_modules`, `.git`, `dist`):
-   `C:\Users\den\AppData\Local\Temp\opencode\ptn-ninja`
-2. Edit files in the real source `ninja-src`, then copy changed files into the build dir (or `/MIR`).
-3. Build: `$env:NODE_OPTIONS="--openssl-legacy-provider"; npx quasar build -m pwa` (run in the build dir).
-   - For GitHub Pages subpath: also set `$env:DEPLOY_BASE="/Trakt/"` before building.
+1. `yarn install` in `ninja-src`.
+2. Build the PWA:
+   - For the repo root: `yarn build`
+   - For the GitHub Pages subpath: `DEPLOY_BASE=/Trakt/ yarn build`
+   (Windows PowerShell: `$env:DEPLOY_BASE="/Trakt/"; yarn build`)
+3. The built output lands in `dist/pwa`. CI builds and publishes on every push to `master`; a local build is only needed to sanity-check.
 4. For the old local `web/` (port 8000) the steps are documented in `build.ps1`.
 
 ## Gotchas
@@ -31,5 +32,7 @@ Ongoing notes for agent sessions on this fork.
 ## Earlier decisions (context)
 
 - Removed the online Openings explorer/database (network + backend) and all related code (`OPENING_DB_API`, `SELECT_OPENINGS`, `openingStats`, etc.).
-- Removed the in-app changelog/"Check for updates" UI and dropped `CNAME` (it pointed at upstream's `ptn.ninja`).
+- Removed the online account/game store entirely: `store/online`, `boot/firebase.js`, the auth dialogs (`LogIn`, `Account`, `JoinGame`, `ShareOnline`) and `pages/Auth.vue`, plus their routes and Firebase scaffolding (`functions/`, `firebase.json`, Firestore/RTDB rules, `firebase-messaging-sw.js`). The app is fully offline; no Firebase config is needed.
+- Removed the in-app changelog / "Check for updates" UI (dialog, `changelog.json`, scripts, route, update-notification button) and dropped `CNAME` (it pointed at upstream's `ptn.ninja`).
+- Removed the remote "Short Link" service and the `/s/:id` unshort route; GIF/PNG export renders locally in a worker. `NODE_OPTIONS=--openssl-legacy-provider` is set via `cross-env` in `package.json` scripts so `yarn dev`/`yarn build` work on Linux/macOS too.
 - Git identity is `denadmin` / `5859803+denadmin@users.noreply.github.com`; `gh` CLI is installed at `C:\Program Files\GitHub CLI\gh.exe` (login as `denadmin`).

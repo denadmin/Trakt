@@ -313,21 +313,6 @@ export const IMPORT_FROM_CLIPBOARD = async function ({ dispatch, getters }) {
       // PTN Ninja url
       let route = router.match(ptn.substring(17));
       if (route && route.name === "local") {
-        if (route.params.id) {
-          Loading.show();
-          const data = await this.getters["ui/urlUnshort"](route.params.id);
-          if (!data) {
-            Loading.hide();
-            return false;
-          }
-          route = {
-            name: "local",
-            params: {
-              ptn: data.ptn,
-              state: data.params,
-            },
-          };
-        }
         if (!isEmpty(route.params)) {
           try {
             const params = parseURLparams(route);

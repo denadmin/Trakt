@@ -83,7 +83,7 @@
         <q-btn
           :label="$t('OK')"
           @click="ok"
-          :disabled="tab === 'load' && !selectedGames.length"
+          :disabled="tab === 'load'"
           color="primary"
           flat
         />
@@ -109,7 +109,6 @@
 <script>
 import GameInfo from "../components/controls/GameInfo";
 import EditPTN from "../dialogs/EditPTN.vue";
-// import GameTable from "../components/controls/GameTable";
 import MoreToggle from "../components/controls/MoreToggle.vue";
 
 import Game from "../Game";
@@ -119,7 +118,6 @@ export default {
   components: {
     GameInfo,
     EditPTN,
-    /* GameTable, */
     MoreToggle,
   },
   data() {
@@ -132,7 +130,6 @@ export default {
         site: this.$t("site_name"),
       },
       ptn: "",
-      selectedGames: [],
       showAll: false,
     };
   },
@@ -143,14 +140,6 @@ export default {
       },
       set(tab) {
         this.$router.replace({ params: { tab } });
-      },
-    },
-    showOnline: {
-      get() {
-        return this.$route.params.type === "online";
-      },
-      set(show) {
-        this.$router.replace({ params: { type: show ? "online" : null } });
       },
     },
     showPTN: {
@@ -294,25 +283,10 @@ export default {
         }
       });
     },
-    async toggleOnline() {
-      await this.$nextTick();
-      this.showOnline = !this.showOnline;
-    },
     ok() {
       if (this.tab === "new") {
         this.$refs.gameInfo.submit();
       } else {
-        if (this.selectedGames.length) {
-          // Load online game(s)
-          this.selectedGames.forEach((game) => {
-            this.$store
-              .dispatch("online/LOAD_GAME", game.config.id)
-              .catch((error) => {
-                this.notifyError(error);
-              });
-          });
-          this.selectedGames = [];
-        }
         this.close();
       }
     },

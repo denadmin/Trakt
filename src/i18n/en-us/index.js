@@ -1,5 +1,5 @@
 export default {
-  site_name: "ptn.ninja",
+  site_name: "Trakt",
   app_title: "PTN Ninja",
 
   About: "About",

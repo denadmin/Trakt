@@ -57,7 +57,3 @@ export const SET_BRANCH_MENU_OPEN = (state, open) => {
 export const SET_THUMBNAIL = (state, { id, options, url }) => {
   state.thumbnails[id] = deepFreeze({ options: cloneDeep(options), url });
 };
-
-export const SET_SHORT_LINK = (state, { hash, url }) => {
-  state.shortLinks[hash] = url;
-};

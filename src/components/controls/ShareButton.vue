@@ -185,12 +185,6 @@ export default {
             label: this.$t("Image"),
             icon: "png",
             action: this.png,
-          },
-          {
-            id: "urlShort",
-            label: this.$t("Short Link"),
-            icon: "url_short",
-            action: async () => await this.shareText("urlShort", true),
           }
         );
       }
@@ -275,17 +269,6 @@ export default {
             text: this.$store.getters["ui/url"](this.$game, {
               origin: true,
               state: true,
-            }),
-          };
-          break;
-        case "urlShort":
-          output = {
-            title: this.$t("Link to Position"),
-            text: await this.$store.dispatch("ui/GET_SHORT_URL", {
-              game: this.$game,
-              options: {
-                state: true,
-              },
             }),
           };
           break;

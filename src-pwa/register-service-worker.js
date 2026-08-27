@@ -1,7 +1,6 @@
 import { i18n } from "../src/boot/i18n";
 import { Platform } from "quasar";
 import { register } from "register-service-worker";
-import router from "../src/router";
 import { notify } from "../src/utilities";
 
 // The ready(), registered(), cached(), updatefound() and updated()
@@ -51,13 +50,6 @@ register(process.env.SERVICE_WORKER_FILE, {
             color: "primary",
             handler: () => {
               window.location.reload();
-            },
-          },
-          {
-            label: i18n.t("Changelog"),
-            color: "primary",
-            handler: () => {
-              router.push({ name: "changelog" });
             },
           },
         ],

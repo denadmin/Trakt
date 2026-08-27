@@ -45,11 +45,6 @@ export default {
           label: this.$t("Full Link"),
           icon: "url",
         },
-        {
-          value: "short",
-          label: this.$t("Short Link"),
-          icon: "url_short",
-        },
       ],
     };
   },
@@ -80,19 +75,11 @@ export default {
         this.$router.back();
       }
     },
-    async updateLink() {
-      this.link =
-        this.linkType === "full"
-          ? this.$store.getters["ui/url"](this.$game, {
-              origin: true,
-              state: true,
-            })
-          : await this.$store.dispatch("ui/GET_SHORT_URL", {
-              game: this.$game,
-              options: {
-                state: true,
-              },
-            });
+    updateLink() {
+      this.link = this.$store.getters["ui/url"](this.$game, {
+        origin: true,
+        state: true,
+      });
       this.show();
     },
   },

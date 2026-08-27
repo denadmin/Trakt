@@ -95,8 +95,6 @@ export default class TopazWasm extends Bot {
         tps,
         size,
         komi: halfKomi / 2,
-        movetime: 1e8,
-        depth: 100,
         hash: this.getSettingsHash(),
         stream: this.isInteractiveEnabled,
         // One-shot analysis matches Tiltak, which only outputs a single PV

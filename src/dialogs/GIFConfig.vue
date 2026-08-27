@@ -620,9 +620,6 @@ export default {
         ...this.config.plyRange,
       });
     },
-    url() {
-      return this.$store.getters["ui/gif_url"](this.options);
-    },
   },
   methods: {
     updateConfig() {
@@ -665,12 +662,7 @@ export default {
           if (this.cancelRequested || this.isGenerationCanceled(workerError)) {
             return;
           }
-          const response = await fetch(this.url);
-          blob = await response.blob();
-          console.warn(
-            "GIF worker generation failed; fell back to server",
-            workerError
-          );
+          throw workerError;
         }
         this.file = new File([blob], this.filename, { type: "image/gif" });
         this.fileSize = humanStorageSize(this.file.size);
@@ -762,12 +754,6 @@ export default {
       } finally {
         this.downloading = false;
       }
-    },
-    share() {
-      this.$store.dispatch("ui/SHARE", {
-        title: "GIF",
-        text: this.url,
-      });
     },
     close() {
       this.cancelGeneration();

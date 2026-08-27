@@ -155,20 +155,8 @@
     <div class="row">
       <div class="col">
         <div class="row q-gutter-md q-mb-md">
-          <!-- Player 1 Account -->
-          <PlayerName
-            v-if="game && game.config.isOnline && player === 1"
-            class="col-grow"
-            v-model="tags.player1"
-            :player="player"
-            :is-private="game.config.isPrivate"
-            hide-bottom-space
-            hide-hint
-          />
-
           <!-- Player 1 Name -->
           <q-input
-            v-else
             class="col-grow"
             v-model="tags.player1"
             name="player1"
@@ -215,20 +203,8 @@
         </div>
 
         <div class="row q-gutter-md">
-          <!-- Player 2 Account -->
-          <PlayerName
-            v-if="game && game.config.isOnline && player === 2"
-            class="col-grow"
-            v-model="tags.player2"
-            :player="player"
-            :is-private="game.config.isPrivate"
-            hide-bottom-space
-            hide-hint
-          />
-
           <!-- Player 2 Name -->
           <q-input
-            v-else
             class="col-grow"
             v-model="tags.player2"
             name="player2"
@@ -741,21 +717,19 @@
 </template>
 
 <script>
-import PlayerName from "./PlayerName";
 import PlyPreview from "./PlyPreview";
 import Result from "../PTN/Result";
 
 import Tag, { formats, KOMI_MIN, KOMI_MAX } from "../../Game/PTN/Tag";
 import TPS, { isEmptyTPS } from "../../Game/PTN/TPS";
 import ResultTag from "../../Game/PTN/Result";
-import { getPlayer } from "../../Game/online";
 import { generateName, isDefaultName, pieceCounts } from "../../Game/base";
 
 import { map, throttle } from "lodash";
 
 export default {
   name: "GameInfo",
-  components: { PlayerName, PlyPreview, Result },
+  components: { PlyPreview, Result },
   props: {
     values: Object,
     showAll: Boolean,
@@ -862,10 +836,9 @@ export default {
       return result ? result.label : "";
     },
     player() {
-      const user = this.$store.state.online
-        ? this.$store.state.online.user
-        : false;
-      return user ? getPlayer(this.game, user.uid) : 0;
+      // The online player store was removed from this offline fork; every
+      // game is local, so there is never an authenticated "current player".
+      return 0;
     },
     date: {
       get() {

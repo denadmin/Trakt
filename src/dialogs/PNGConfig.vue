@@ -567,12 +567,6 @@ export default {
     download() {
       this.$store.dispatch("ui/DOWNLOAD_FILES", this.file);
     },
-    share() {
-      this.$store.dispatch("ui/SHARE", {
-        title: "PNG",
-        text: this.$store.getters["ui/png_url"](this.$game),
-      });
-    },
     close() {
       this.$refs.dialog.hide();
     },

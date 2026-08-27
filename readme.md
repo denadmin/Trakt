@@ -1,57 +1,61 @@
-# PTN Ninja
+# Trakt
 
-This is an editor and viewer for [Portable Tak Notation (PTN)](https://ustak.org/portable-tak-notation/). It aims to be...
+**Trakt** is an offline, self-hosted fork of [PTN Ninja](https://github.com/gruppler/PTN-Ninja) — an editor and viewer for [Portable Tak Notation (PTN)](https://ustak.org/portable-tak-notation/). It aims to be...
 
 - Useful for transcription of live games, even on a phone.
 - Intuitive, with a minimal UI that is enjoyable to use.
 - Responsive, with a fluid design that works as well on a phone as it does in full-screen on a desktop.
 
+This fork runs fully in the browser with no backend: no accounts, no Firebase, no short-link service. It is built as an installable PWA and can be hosted on any static host (e.g. GitHub Pages). See [CHANGES.md](CHANGES.md) for the full list of changes relative to upstream.
+
 ## Installation
 
 ### Prerequisites
 
-- Quasar: https://v1.quasar.dev/quasar-cli/installation
-- Firebase: https://firebase.google.com/docs/emulator-suite/install_and_configure
+- Node.js (LTS) and [Yarn](https://classic.yarnpkg.com/en/docs/install) 1.x
 
-### Install the client-side dependencies
+### Install the dependencies
 
 ```bash
 yarn
 ```
 
-### Install the server-side dependencies (optional)
-
-```bash
-pushd functions && npm install && popd
-```
-
-#### Start the app in development mode (hot-code reloading, error reporting, etc.)
+### Run the app in development mode (hot-code reloading, error reporting, etc.)
 
 ```bash
 yarn dev
 ```
 
-#### Start the server emulators (optional)
+`yarn dev:pwa` runs the same dev server with service-worker support.
 
-```bash
-yarn emulate
-```
-
-#### Lint the files
+### Lint the files
 
 ```bash
 yarn lint
 ```
 
-#### Build the app for production
+### Build the app for production
 
 ```bash
 yarn build
 ```
 
+The PWA build lands in `dist/pwa`. When deploying under a URL subpath (e.g. a GitHub Pages repo), build with `DEPLOY_BASE=/<repo-name>/`:
+
+```bash
+DEPLOY_BASE=/Trakt/ yarn build
+```
+
+### Run the e2e tests
+
+```bash
+yarn test:install   # once: installs Playwright + Chromium
+yarn test
+```
+
 ## API
 
-PTN Ninja can send and receive messages with its opening or parent window using [`Window.postMessage()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). These messages are objects containing an `action`, as well as a `value` where applicable.
+Trakt can send and receive messages with its opening or parent window using [`Window.postMessage()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). These messages are objects containing an `action`, as well as a `value` where applicable.
 
 For example:
 
@@ -350,13 +354,13 @@ These messages are sent from PTN Ninja to its parent or opening window via `post
 
 ## URLs
 
-PTN Ninja uses [lz-string](https://pieroxy.net/blog/pages/lz-string/guide.html#inline_menu_3) to encode PTN and some other parameters for use in the URL. However, it will also do its best to read these parameters when passed as plaintext.
+Trakt uses [lz-string](https://pieroxy.net/blog/pages/lz-string/guide.html#inline_menu_3) to encode PTN and some other parameters for use in the URL. However, it will also do its best to read these parameters when passed as plaintext.
 
 The structure of the URL is as follows:
 
-`https://ptn.ninja/<PTN>&<param1>=<value1>&<param2>=<value2>[...]`
+`<host>/<PTN>&<param1>=<value1>&<param2>=<value2>[...]`
 
-To get a shortened URL, send a POST request to `https://url.ptn.ninja/short` with request body `{ ptn, params (optional) }` where `ptn` is a string, and `params` is an optional object containing any of the parameters below. If the request is valid, you'll receive the complete shortenend URL as plain text in response. If the URL is not accessed within 30 days, it will be deleted.
+> Note: the upstream PTN Ninja short-link service (`url.ptn.ninja`) was removed in this fork. Share/embed links are full (non-shortened) URLs.
 
 ### URL Parameters
 

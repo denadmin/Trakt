@@ -25,7 +25,8 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command: "yarn dev",
+    command:
+      "npx cross-env NODE_OPTIONS=--openssl-legacy-provider quasar dev -m spa",
     url: "http://localhost:8081",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

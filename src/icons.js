@@ -32,7 +32,6 @@ export default {
   caps1: "mdi-circle",
   caps2: "mdi-circle-outline",
   chat: "mdi-forum-outline",
-  changelog: "mdi-party-popper",
   clear: "mdi-close-circle",
   clipboard: "mdi-clipboard",
   clock: "mdi-timer",

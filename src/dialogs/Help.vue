@@ -121,7 +121,7 @@
 <script>
 import Hotkeys from "../components/general/Hotkeys.vue";
 import FullscreenToggle from "../components/controls/FullscreenToggle";
-import { APP_VERSION } from "../utils/changelog";
+import { APP_VERSION } from "../utils/version";
 
 export default {
   name: "Help",

@@ -1,7 +1,6 @@
 import { decompressFromEncodedURIComponent } from "lz-string";
 import { Platform } from "quasar";
 import { isString } from "lodash";
-import store from "../store";
 
 export function parseURLparams(route) {
   let state = route.params.state || {};
@@ -78,16 +77,6 @@ const routes = [
     props: true,
   },
   {
-    name: "auth",
-    path: "/auth",
-    component: () => import("pages/Auth"),
-  },
-  {
-    name: "shortened",
-    path: "/s/:id",
-    redirect: (to) => ({ name: "local", params: to.params }),
-  },
-  {
     name: "local",
     path: "/:ptn([^&]+)?:state(.*)?",
     component: () => {
@@ -95,29 +84,8 @@ const routes = [
         ? import("layouts/Embed")
         : import("layouts/Main");
     },
-    beforeEnter: async (to, from, next) => {
-      if (to.params.id) {
-        const data = await store.getters["ui/urlUnshort"](to.params.id);
-        next({
-          name: "local",
-          params: data
-            ? {
-                ptn: data.ptn,
-                state: data.params,
-              }
-            : {},
-        });
-      } else {
-        next();
-      }
-    },
     props: parseURLparams,
     children: [
-      {
-        name: "account",
-        path: "/account",
-        component: () => import("../dialogs/Account"),
-      },
       {
         name: "add",
         path: "/add/:tab?/:type?/:fullscreen?",
@@ -165,11 +133,6 @@ const routes = [
         component: () => import("../dialogs/Help"),
       },
       {
-        name: "changelog",
-        path: "/changelog",
-        component: () => import("../dialogs/Changelog"),
-      },
-      {
         name: "info-view",
         path: "/info",
         component: () => import("../dialogs/GameInfo"),
@@ -178,16 +141,6 @@ const routes = [
         name: "info-edit",
         path: "/info/edit",
         component: () => import("../dialogs/EditGame"),
-      },
-      {
-        name: "join",
-        path: "/join",
-        component: () => import("../dialogs/JoinGame"),
-      },
-      {
-        name: "login",
-        path: "/login/:tab?",
-        component: () => import("../dialogs/LogIn"),
       },
       {
         name: "eval-graph",
