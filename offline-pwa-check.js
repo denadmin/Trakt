@@ -71,10 +71,12 @@ const URL = process.argv[2] || "http://127.0.0.1:8090/";
   await page.waitForSelector(".square", { timeout: 30000 });
   console.log("App boots offline.");
 
-  // 3. Start a bot game offline.
+  // 3. Start a bot game offline (the "vs Bot" tab of the Add Game dialog).
   await page.click("#fab");
-  await page.waitForSelector("text=Play vs Bot", { timeout: 15000 });
-  await page.click("text=Play vs Bot");
+  await page.waitForSelector('.q-dialog .q-tab:has-text("vs Bot")', {
+    timeout: 15000,
+  });
+  await page.click('.q-dialog .q-tab:has-text("vs Bot")');
   await page.waitForSelector('.q-dialog:has-text("Engine")', {
     timeout: 15000,
   });

@@ -98,7 +98,7 @@ async function expectMainlineCount(page, expected) {
       );
     },
     expected,
-    { timeout: 15000 }
+    { timeout: 30000 }
   );
 }
 
@@ -114,6 +114,15 @@ async function startFollowing(page) {
   await page.waitForFunction(() => window.app && window.app.$store, {
     timeout: 30000,
   });
+  // game/INIT opens IndexedDB asynchronously, and Main.vue's starter-game
+  // ADD_GAME only persists + commits ~200ms later. Following before the
+  // starter game exists makes the Observe rename hit "Game not found: 6x6".
+  // The list commit happens after the DB write, so waiting for it guarantees
+  // the rename's source game is persisted.
+  await page.waitForFunction(
+    () => window.app.$store.state.game.list.length > 0,
+    { timeout: 30000 }
+  );
 
   await page.evaluate((id) => {
     window.app.$store.dispatch("game/FOLLOW_PLAYTAK_GAME", { id });

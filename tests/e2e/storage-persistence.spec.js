@@ -57,6 +57,15 @@ async function waitForApp(page) {
   await page.waitForFunction(() => window.app && window.app.$store, {
     timeout: 30000,
   });
+  // game/INIT loads IndexedDB asynchronously; dispatching ADD_GAME before it
+  // finishes makes the test's game the "first" one (which deliberately skips
+  // the persistence request) even though the starter game is about to exist.
+  await page.waitForFunction(
+    () =>
+      window.app.$store.state.game.init &&
+      window.app.$store.state.game.list.length > 0,
+    { timeout: 30000 }
+  );
 }
 
 async function addGame(page, name) {

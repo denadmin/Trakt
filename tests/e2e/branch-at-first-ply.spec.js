@@ -149,6 +149,11 @@ test.describe("Branch at First Ply", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await page.waitForFunction(() => window.app && window.app.$store);
+    // Wait for game/INIT and the starter game: ADD_GAME before INIT finishes
+    // has no IndexedDB handle yet, so the game silently fails to load.
+    await page.waitForFunction(
+      () => window.app.$store.state.game.list.length > 0
+    );
   });
 
   test("Original bug: PTN with branches at TPS move loads without errors", async ({

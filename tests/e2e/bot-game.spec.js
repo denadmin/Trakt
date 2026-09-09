@@ -25,8 +25,9 @@ async function openApp(page) {
 
 async function openBotDialog(page) {
   await page.click("#fab");
-  await page.waitForSelector("text=Play vs Bot");
-  await page.click("text=Play vs Bot");
+  // The bot setup lives in the Add Game dialog's "vs Bot" tab.
+  await page.waitForSelector(".q-dialog");
+  await page.click('.q-dialog .q-tab:has-text("vs Bot")');
   await page.waitForSelector('.q-dialog:has-text("Engine")');
 }
 

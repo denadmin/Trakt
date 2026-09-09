@@ -128,6 +128,11 @@ test.describe("PlayTak live move append", () => {
       await page.waitForFunction(() => window.app && window.app.$store, {
         timeout: 30000,
       });
+      // game/INIT opens IndexedDB asynchronously; loading a game before it
+      // finishes races the uninitialized DB on a busy dev server.
+      await page.waitForFunction(() => window.app.$store.state.game.init, {
+        timeout: 30000,
+      });
     });
 
     test("still appends a live ply", async ({ page }) => {
@@ -223,6 +228,11 @@ test.describe("PlayTak live move append", () => {
       await stubAnnotator(page, COUNTING_ANNOTATOR);
       await page.goto("/");
       await page.waitForFunction(() => window.app && window.app.$store, {
+        timeout: 30000,
+      });
+      // game/INIT opens IndexedDB asynchronously; loading a game before it
+      // finishes races the uninitialized DB on a busy dev server.
+      await page.waitForFunction(() => window.app.$store.state.game.init, {
         timeout: 30000,
       });
     });
