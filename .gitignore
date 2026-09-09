@@ -26,3 +26,7 @@ yarn-error.log*
 *.sh
 .omo/*
 .opencode/*
+
+# Playwright
+test-results
+playwright-report

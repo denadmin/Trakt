@@ -14,11 +14,23 @@ installed as a PWA and deployed to GitHub Pages (or any static host).
     `go nodes` only ever emits one line); Multi-PV is available in
     interactive mode and configurable via the `MultiPV` engine option.
 - **Play vs Bot.**
-  - New "Play vs Bot" entry in the Add Game dialog; pick Topaz or Tiltak,
-    board size, komi and your color. A dedicated `BotOpponent` component
-    searches the engine and auto-plays replies in a local game.
-  - Gameplay uses a bounded one-shot search, so the bot always replies
-    promptly regardless of analysis settings.
+  - The setup dialog (`dialogs/BotGame.vue`) now offers engine (with
+    descriptions), strength presets (Fast / Normal / Strong / Maximum),
+    engine-valid board sizes (Tiltak also plays 4×4), komi presets and a
+    White / Random / Black side picker; choices persist between sessions.
+    "Play vs Bot" moved to the top of the Add Game dialog's "New Game" tab.
+  - A bot status bar (`components/board/BotGameBar.vue`) shows whose turn it
+    is and whether the bot is thinking, with Takeback (removes your move and
+    the bot's reply), Resign (records an "R" result and stops the bot),
+    New Bot Game and Stop Bot actions.
+  - Gameplay uses a bounded one-shot search driven by the strength preset
+    (`bots/botGame.js`), so the bot always replies promptly regardless of
+    analysis settings.
+  - Robustness fixes: the bot no longer inserts its reply into a different
+    game after the user switches games mid-search; Tiltak re-runs its
+    `teinewgame` handshake when a new game uses a different size/komi (the
+    wasm build used to panic on mismatched TPS); board sizes are validated
+    against the selected engine's supported set.
 - **Bundled engines rebuilt.**
   - `public/topaz/*` and `public/tiltak-wasm/*` now ship newer wasm builds
     with the features above.
@@ -40,6 +52,15 @@ installed as a PWA and deployed to GitHub Pages (or any static host).
 - `.github/workflows/deploy.yml` builds the PWA and publishes it to GitHub
   Pages on every push to `master`, and now also runs the Playwright e2e suite
   in a separate `test` job.
+
+## Offline PWA fix
+
+- The Workbox precache skipped any file larger than its 2 MiB default, which
+  included the vendor bundle — the app could not start offline at all.
+  `quasar.conf.js` now raises `maximumFileSizeToCacheInBytes`; the wasm
+  engines copied from `public/` were already precached as webpack assets.
+  `offline-pwa-check.js` verifies the full offline path (install SW, go
+  offline, reload, play a bot move) against a served `dist/pwa`.
 
 ## Offline / local-run cleanup
 

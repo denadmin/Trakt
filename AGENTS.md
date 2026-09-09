@@ -27,7 +27,7 @@ Ongoing notes for agent sessions on this fork.
 ## Engines
 
 - Built-in bots: `tiltak` (wasm), `topaz` (wasm), `tinue-solver` (wasm), `tei` (remote). `TopazWasm` is interactive and has a `MultiPV` option; "Analyze Position" is single-PV by design (matches Tiltak's `go nodes` behavior).
-- Play vs Bot (`BotOpponent.vue` + `BotGame.vue`) uses its own engine instances and bounded one-shot searches.
+- Play vs Bot (`BotOpponent.vue` + `BotGame.vue`) uses its own engine instances and bounded one-shot searches. Engine capabilities + strength presets live in `src/bots/botGame.js` (dialog, opponent driver and the `BotGameBar.vue` status bar all read from it); the bot status bar mounts in the Main layout footer and offers takeback/resign/new game/stop.
 
 ## Earlier decisions (context)
 

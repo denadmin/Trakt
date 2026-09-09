@@ -12,7 +12,10 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:8081",
+    // Explicit IPv4: the dev server binds 0.0.0.0, and "localhost" can
+    // resolve to ::1 first (especially on Windows), which breaks both the
+    // reuse check and page loads.
+    baseURL: "http://127.0.0.1:8081",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -25,11 +28,17 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command:
-      "npx cross-env NODE_OPTIONS=--openssl-legacy-provider quasar dev -m spa",
-    url: "http://localhost:8081",
+    // Invoke the local CLI directly and pass NODE_OPTIONS via `env` — the
+    // previous `npx cross-env ...` chain hangs when spawned by Playwright on
+    // Windows.
+    command: "node node_modules/@quasar/cli/bin/quasar.js dev -m spa",
+    env: {
+      ...process.env,
+      NODE_OPTIONS: "--openssl-legacy-provider",
+    },
+    url: "http://127.0.0.1:8081",
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: 300 * 1000,
     cwd: "..",
   },
 });
