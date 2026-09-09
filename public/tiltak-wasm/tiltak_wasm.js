@@ -5,6 +5,21 @@ let wasm_bindgen = (function(exports) {
     }
 
     /**
+     * See `is_tak_impl`. `size` selects the monomorphized board; unsupported
+     * sizes answer false.
+     * @param {string} tps
+     * @param {number} size
+     * @returns {boolean}
+     */
+    function is_tak(tps, size) {
+        const ptr0 = passStringToWasm0(tps, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.is_tak(ptr0, len0, size);
+        return ret !== 0;
+    }
+    exports.is_tak = is_tak;
+
+    /**
      * Starts the TEI engine.
      *
      * `callback` is invoked with each output line (e.g. `info ...`, `bestmove ...`,
@@ -151,7 +166,7 @@ let wasm_bindgen = (function(exports) {
                 return ret;
             },
             __wbindgen_cast_0000000000000001: function(arg0, arg1) {
-                // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 114, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
+                // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 116, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
                 const ret = makeMutClosure(arg0, arg1, wasm_bindgen_2f31660b723adcb7___convert__closures_____invoke___wasm_bindgen_2f31660b723adcb7___JsValue__core_f0fd674eaa06beef___result__Result_____wasm_bindgen_2f31660b723adcb7___JsError___true_);
                 return ret;
             },

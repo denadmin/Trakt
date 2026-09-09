@@ -3,6 +3,12 @@ declare namespace wasm_bindgen {
     /* eslint-disable */
 
     /**
+     * See `is_tak_impl`. `size` selects the monomorphized board; unsupported
+     * sizes answer false.
+     */
+    export function is_tak(tps: string, size: number): boolean;
+
+    /**
      * Starts the TEI engine.
      *
      * `callback` is invoked with each output line (e.g. `info ...`, `bestmove ...`,
@@ -15,6 +21,7 @@ declare type InitInput = RequestInfo | URL | Response | BufferSource | WebAssemb
 
 declare interface InitOutput {
     readonly memory: WebAssembly.Memory;
+    readonly is_tak: (a: number, b: number, c: number) => number;
     readonly start_engine: (a: any) => any;
     readonly wasm_bindgen_2f31660b723adcb7___convert__closures_____invoke___wasm_bindgen_2f31660b723adcb7___JsValue__core_f0fd674eaa06beef___result__Result_____wasm_bindgen_2f31660b723adcb7___JsError___true_: (a: number, b: number, c: any) => [number, number];
     readonly wasm_bindgen_2f31660b723adcb7___convert__closures_____invoke___wasm_bindgen_2f31660b723adcb7___JsValue______true_: (a: number, b: number, c: any) => void;

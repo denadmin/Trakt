@@ -18,4 +18,9 @@ constructors.forEach((Bot) => {
   const bot = new Bot();
   bots[bot.id] = bot;
   botListOptions.push(bot.listOption);
+
+  // Dev-only handle for tests and console debugging, like window.app.
+  if (process.env.DEV && typeof window !== "undefined") {
+    window.bots = bots;
+  }
 });

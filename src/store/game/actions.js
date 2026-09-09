@@ -1338,9 +1338,9 @@ export const SET_PLAYER = function ({ commit }, player) {
 // looking.
 export const SET_BOT = function (
   { commit, dispatch },
-  { bot, botPlayer, player } = {}
+  { bot, botPlayer, player, botStrength } = {}
 ) {
-  commit("SET_BOT", { bot, botPlayer, player });
+  commit("SET_BOT", { bot, botPlayer, player, botStrength });
   dispatch("SAVE_CURRENT_GAME", true);
 };
 

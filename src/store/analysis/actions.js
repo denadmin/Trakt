@@ -282,6 +282,33 @@ export const REORDER_ACTIVE_BOTS = (
   saveCollapsedBots(state);
 };
 
+// Stop every engine except `keepBotID`: interactive streams get disabled
+// (the setter terminates the worker and unwatches the position) and running
+// one-shot searches/sweeps get cancelled. Without this, switching engines
+// left the previous engine burning CPU in an infinite analysis nobody was
+// looking at. Returns whether the stopped engine had interactive mode on,
+// so the caller can carry the mode over to the newly selected engine.
+const stopOtherEngines = (keepBotID) => {
+  let wasInteractive = false;
+  Object.entries(bots).forEach(([id, bot]) => {
+    if (!bot || id === keepBotID) {
+      return;
+    }
+    if (bot.isInteractiveEnabled) {
+      wasInteractive = true;
+      bot.isInteractiveEnabled = false;
+    } else if (
+      bot.state.isRunning &&
+      (bot.state.isAnalyzingPosition ||
+        bot.state.isAnalyzingGame ||
+        bot.state.isAnalyzingBranch)
+    ) {
+      bot.terminate();
+    }
+  });
+  return wasInteractive;
+};
+
 // Engine selection with bidirectional syncing
 export const SELECT_ENGINE = (
   { state, dispatch, rootState, rootGetters },
@@ -289,11 +316,23 @@ export const SELECT_ENGINE = (
 ) => {
   dispatch("SET", ["preferSavedResults", false]);
   dispatch("SET", ["analysisSource", "engines"]);
+  let carryInteractive = false;
   if (botId && botId !== state.botID) {
+    carryInteractive = stopOtherEngines(botId);
     dispatch("SET", ["botID", botId]);
   }
-  // Sync savedBotName to match the selected engine's label
+  // Carry interactive analysis over to the newly selected engine so
+  // comparing engines on the same position doesn't require re-enabling it.
   const bot = bots[botId];
+  if (
+    carryInteractive &&
+    bot &&
+    bot.isInteractiveAvailable &&
+    !bot.isInteractiveEnabled
+  ) {
+    bot.isInteractiveEnabled = true;
+  }
+  // Sync savedBotName to match the selected engine's label
   const label = bot ? bot.label : null;
   if (label) {
     const allPlies = rootState.game?.ptn?.allPlies;
@@ -518,6 +557,7 @@ export const SELECT_SAVED_ENGINE = ({ state, dispatch }, botName) => {
       const bot = bots[id];
       if (bot && bot.label === botName) {
         if (id !== state.botID) {
+          stopOtherEngines(id);
           dispatch("SET", ["botID", id]);
         }
         break;
