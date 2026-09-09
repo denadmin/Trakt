@@ -116,6 +116,13 @@ module.exports = function (ctx) {
         // links offline. Must match the precache manifest key exactly (the
         // deployBase-prefixed index document).
         navigateFallback: `${deployBase}index.html`,
+        // The vendor bundle exceeds Workbox's 2 MiB default per-file limit
+        // and would otherwise be silently omitted from the precache, breaking
+        // offline startup. The wasm engines copied from public/ are already
+        // precached as webpack assets; do NOT re-add them here — duplicate
+        // manifest entries with different revisions abort the precache
+        // install and leave the service worker with no routes at all.
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },
       manifest: {
         name: "Trakt",
