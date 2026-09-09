@@ -175,7 +175,7 @@ export default {
         });
     },
     newGame() {
-      this.$router.push({ name: "bot-game" });
+      this.$router.push({ name: "add", params: { tab: "vsbot" } });
     },
     stopBot() {
       this.$store.dispatch("game/STOP_BOT");

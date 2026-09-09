@@ -210,6 +210,7 @@ export default {
   "Play Online": "Play Online",
   "Play Speed": "Play Speed",
   "Play vs Bot": "Play vs Bot",
+  "Vs Bot": "vs Bot",
   "Play as": "Play as",
   "Bot plays as": "Bot plays as",
   "Continue from current position": "Continue from current position",

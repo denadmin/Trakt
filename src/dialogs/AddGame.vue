@@ -15,6 +15,7 @@
       >
         <q-tab name="load" :label="$t('Load Game')" />
         <q-tab name="new" :label="$t('New Game')" />
+        <q-tab name="vsbot" :label="$t('Vs Bot')" />
       </q-tabs>
     </template>
 
@@ -46,24 +47,6 @@
           </q-tab-panel>
 
           <q-tab-panel name="new" class="q-pa-none">
-            <!-- Play vs Bot -->
-            <q-list separator>
-              <q-item
-                @click="$router.push({ name: 'bot-game' })"
-                clickable
-                v-ripple
-              >
-                <q-item-section avatar>
-                  <q-icon name="mdi-robot-outline" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ $t("Play vs Bot") }}</q-item-label>
-                </q-item-section>
-                <q-item-section avatar>
-                  <q-icon name="right" />
-                </q-item-section>
-              </q-item>
-            </q-list>
             <q-card-section class="q-pa-none">
               <GameInfo
                 ref="gameInfo"
@@ -76,6 +59,10 @@
               />
             </q-card-section>
           </q-tab-panel>
+
+          <q-tab-panel name="vsbot" class="q-pa-none">
+            <BotGameForm ref="botForm" @started="onBotStarted" />
+          </q-tab-panel>
         </q-tab-panels>
       </smooth-reflow>
     </q-card>
@@ -87,7 +74,7 @@
         <div class="col-grow" />
         <q-btn :label="$t('Cancel')" color="primary" flat v-close-popup />
         <q-btn
-          :label="$t('OK')"
+          :label="tab === 'vsbot' ? $t('Start') : $t('OK')"
           @click="ok"
           :disabled="tab === 'load'"
           color="primary"
@@ -102,17 +89,11 @@
       @submit="clipboardCreate"
       no-route-dismiss
     />
-
-    <EditPTN
-      v-model="showPTN"
-      :ptn="ptn"
-      @submit="clipboardCreate"
-      no-route-dismiss
-    />
   </small-dialog>
 </template>
 
 <script>
+import BotGameForm from "../components/controls/BotGameForm";
 import GameInfo from "../components/controls/GameInfo";
 import EditPTN from "../dialogs/EditPTN.vue";
 import MoreToggle from "../components/controls/MoreToggle.vue";
@@ -122,6 +103,7 @@ import Game from "../Game";
 export default {
   name: "AddGame",
   components: {
+    BotGameForm,
     GameInfo,
     EditPTN,
     MoreToggle,
@@ -290,11 +272,17 @@ export default {
       });
     },
     ok() {
-      if (this.tab === "new") {
+      if (this.tab === "vsbot") {
+        this.$refs.botForm.start();
+      } else if (this.tab === "new") {
         this.$refs.gameInfo.submit();
       } else {
         this.close();
       }
+    },
+    onBotStarted() {
+      // The bot game became the active game; close this dialog.
+      this.$router.replace({ name: "local" });
     },
   },
 };
