@@ -42,8 +42,12 @@
                 </q-item-section>
                 <q-item-section>{{ $t("Files") }}</q-item-section>
               </q-item>
+            </q-list>
+          </q-tab-panel>
 
-              <!-- Play vs Bot -->
+          <q-tab-panel name="new" class="q-pa-none">
+            <!-- Play vs Bot -->
+            <q-list separator>
               <q-item
                 @click="$router.push({ name: 'bot-game' })"
                 clickable
@@ -52,12 +56,14 @@
                 <q-item-section avatar>
                   <q-icon name="mdi-robot-outline" />
                 </q-item-section>
-                <q-item-section>{{ $t("Play vs Bot") }}</q-item-section>
+                <q-item-section>
+                  <q-item-label>{{ $t("Play vs Bot") }}</q-item-label>
+                </q-item-section>
+                <q-item-section avatar>
+                  <q-icon name="right" />
+                </q-item-section>
               </q-item>
             </q-list>
-          </q-tab-panel>
-
-          <q-tab-panel name="new" class="q-pa-none">
             <q-card-section class="q-pa-none">
               <GameInfo
                 ref="gameInfo"

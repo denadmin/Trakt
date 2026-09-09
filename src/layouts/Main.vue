@@ -249,6 +249,8 @@
     </q-drawer>
 
     <q-footer class="bg-panel">
+      <BotGameBar />
+
       <ToolbarAnalysis v-if="hasAnalysis && $q.screen.height >= singleWidth" />
 
       <div class="relative-position">
@@ -291,6 +293,7 @@
 <script>
 // Essentials:
 import Board from "../components/board/Board";
+import BotGameBar from "../components/board/BotGameBar";
 import CurrentMove from "../components/board/CurrentMove";
 import PTN from "../components/drawers/PTN";
 import Notes from "../components/drawers/Notes";
@@ -328,6 +331,7 @@ export default {
   name: "MainLayout",
   components: {
     Board,
+    BotGameBar,
     CurrentMove,
     PTN,
     Notes,
@@ -859,7 +863,8 @@ export default {
       }
     },
     addGame() {
-      this.$router.push({ name: "add", params: { tab: "load" } });
+      // Defaults to the "new" tab, whose first entry is "Play vs Bot".
+      this.$router.push({ name: "add", params: { tab: "new" } });
     },
     info() {
       this.$router.push({ name: "info-view" });

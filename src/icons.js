@@ -82,6 +82,7 @@ export default {
   json: "mdi-code-json",
   keyboard: "mdi-keyboard-variant",
   komi: "mdi-scale-balance",
+  flag: "mdi-flag",
   last: "mdi-page-last",
   less: "mdi-unfold-less-horizontal",
   local: "mdi-monitor-cellphone",

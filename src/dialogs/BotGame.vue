@@ -7,53 +7,96 @@
     v-bind="$attrs"
   >
     <template v-slot:header>
-      <div class="text-subtitle1 q-px-md q-py-sm">Play vs Bot</div>
+      <div class="text-subtitle1 q-px-md q-py-sm">{{ $t("Play vs Bot") }}</div>
     </template>
 
     <q-card>
       <q-card-section class="q-gutter-sm">
-        <q-item v-if="continueMode" class="q-pa-none" style="min-height: 0">
-          <q-item-section>
-            <q-item-label caption>{{
-              $t("Continue from current position")
-            }}</q-item-label>
-          </q-item-section>
-        </q-item>
+        <q-banner
+          v-if="continueMode"
+          rounded
+          dense
+          class="bg-primary text-white"
+        >
+          <template v-slot:avatar>
+            <q-icon name="bot_on" />
+          </template>
+          {{ $t("Continue from current position") }}
+        </q-banner>
+
         <q-select
           v-model="engine"
-          :options="engines"
-          :label="$t('Engine')"
+          :options="engineOptions"
+          :label="$tc('Engine', 1)"
           emit-value
           map-options
           dense
           options-dense
-        />
+        >
+          <template v-slot:selected-item="scope">
+            {{ scope.opt.label }}
+          </template>
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+              <q-item-section>
+                <q-item-label>{{ scope.opt.label }}</q-item-label>
+                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+
         <q-select
-          v-if="!continueMode"
-          v-model="size"
-          :options="sizes"
-          :label="$t('Size')"
+          v-model="strength"
+          :options="strengthOptions"
+          :label="$t('botGame.strength')"
+          :hint="strengthHint"
           emit-value
           map-options
           dense
           options-dense
         />
-        <q-input
-          v-if="!continueMode"
-          v-model.number="komi"
-          type="number"
-          :label="$t('Komi')"
+
+        <template v-if="!continueMode">
+          <q-select
+            v-model="size"
+            :options="sizeOptions"
+            :label="$t('Size')"
+            emit-value
+            map-options
+            dense
+            options-dense
+          />
+          <q-select
+            v-model="komi"
+            :options="komiOptions"
+            :label="$t('Komi')"
+            emit-value
+            map-options
+            dense
+            options-dense
+          />
+        </template>
+
+        <q-field
+          :label="$t('botGame.youPlay')"
+          stack-label
           dense
-        />
-        <q-select
-          v-model="botColor"
-          :options="sides"
-          :label="$t('Bot plays as')"
-          emit-value
-          map-options
-          dense
-          options-dense
-        />
+          borderless
+          class="q-pt-none"
+        >
+          <template v-slot:control>
+            <q-btn-toggle
+              v-model="humanPlayer"
+              :options="sideOptions"
+              no-caps
+              dense
+              unelevated
+              toggle-color="primary"
+              class="q-mt-xs"
+            />
+          </template>
+        </q-field>
       </q-card-section>
       <q-card-actions align="right">
         <q-btn
@@ -74,58 +117,117 @@
 <script>
 import Game from "../Game";
 import { uniqueName } from "../store/game/getters";
+import {
+  BOT_ENGINES,
+  STRENGTHS,
+  KOMI_CHOICES,
+  getEngine,
+  nearestSize,
+  loadSettings,
+  saveSettings,
+} from "../bots/botGame";
 
 export default {
   name: "BotGame",
-  components: {},
   data() {
-    const analysisBot = this.$store.state.analysis
-      ? this.$store.state.analysis.botID
-      : null;
-    return {
-      engine: ["topaz", "tiltak"].includes(analysisBot) ? analysisBot : "topaz",
-      engines: [
-        { label: "Topaz", value: "topaz" },
-        { label: "Tiltak", value: "tiltak" },
-      ],
+    const continueMode = this.$route.query.continue === "1";
+    const settings = loadSettings(this.$q, {
+      engine: "topaz",
+      strength: "strong",
       size: Number(this.$store.state.ui.size) || 6,
-      sizes: [
-        { label: "5 × 5", value: 5 },
-        { label: "6 × 6", value: 6 },
-      ],
       komi: Number(this.$store.state.ui.komi) || 0,
-      // The field represents the bot's color directly (1=White, 2=Black),
-      // so selecting "Black" means the bot is Black and the human is White.
-      // For a new game default the bot to Black; for continue mode, default
-      // the bot to the side NOT to move so the human (the side to move)
-      // goes first. Computed inline because Vue initializes `data` before
-      // `computed`.
-      botColor:
-        this.$route.query.continue === "1"
-          ? 3 - (Number(this.$store.state.game.position.turn) || 1) || 2
-          : 2,
-      sides: [
-        { label: "White", value: 1 },
-        { label: "Black", value: 2 },
-      ],
+      humanPlayer: 1,
+    });
+    // In continue mode the human is whoever is on turn, so the bot (default)
+    // takes the waiting side and replies to the human's next move.
+    if (continueMode) {
+      settings.humanPlayer = Number(this.$store.state.game.position.turn) || 1;
+    }
+    return {
+      continueMode,
+      engine: settings.engine,
+      strength: settings.strength,
+      size: nearestSize(settings.engine, settings.size),
+      komi: Number(settings.komi) || 0,
+      humanPlayer: settings.humanPlayer,
     };
   },
   computed: {
-    continueMode() {
-      return this.$route.query.continue === "1";
+    engineOptions() {
+      return Object.values(BOT_ENGINES).map((engine) => ({
+        label: engine.label,
+        value: engine.id,
+        description: engine.description,
+      }));
+    },
+    strengthOptions() {
+      return STRENGTHS.map((strength) => ({
+        label: this.$t("botGame.strengths." + strength.id),
+        value: strength.id,
+      }));
+    },
+    strengthHint() {
+      const strength = STRENGTHS.find((s) => s.id === this.strength);
+      return strength ? this.$t("botGame.strengthHints." + strength.id) : "";
+    },
+    sizeOptions() {
+      const engine = getEngine(this.engine);
+      return engine
+        ? engine.sizes.map((size) => ({
+            label: `${size} × ${size}`,
+            value: size,
+          }))
+        : [];
+    },
+    komiOptions() {
+      const engine = getEngine(this.engine);
+      const komiMax = engine ? engine.komiMax : 2;
+      return KOMI_CHOICES.filter((komi) => komi <= komiMax).map((komi) => ({
+        label: String(komi),
+        value: komi,
+      }));
+    },
+    sideOptions() {
+      return [
+        { label: this.$t("White"), value: 1 },
+        { label: this.$t("Random"), value: "random" },
+        { label: this.$t("Black"), value: 2 },
+      ];
     },
     hasBot() {
       const config = this.$store.state.game.config || {};
       return !!config.bot;
     },
-    humanPlayer() {
-      return 3 - this.botColor;
-    },
-    botPlayer() {
-      return this.botColor;
+  },
+  watch: {
+    // Engines only support some board sizes; keep the selection valid when
+    // the engine changes (e.g. Tiltak offers 4×4, Topaz doesn't).
+    engine(engine) {
+      if (!this.continueMode) {
+        this.size = nearestSize(engine, this.size);
+      }
     },
   },
   methods: {
+    persistSettings() {
+      saveSettings(this.$q, {
+        engine: this.engine,
+        strength: this.strength,
+        size: this.size,
+        komi: this.komi,
+        humanPlayer: this.humanPlayer,
+      });
+    },
+    resolveHumanPlayer() {
+      if (this.humanPlayer !== "random") {
+        return this.humanPlayer;
+      }
+      if (this.continueMode) {
+        // Random makes no sense mid-game: the waiting side plays second.
+        return Number(this.$store.state.game.position.turn) || 1;
+      }
+      return Math.random() < 0.5 ? 1 : 2;
+    },
     cancel() {
       this.$router.replace({ name: "local" });
     },
@@ -133,27 +235,35 @@ export default {
       if (this.continueMode) {
         return this.continueStart();
       }
-      const size = Number(this.size) || 6;
+      const engine = this.engine;
+      const botLabel = getEngine(engine).label;
+      const size = nearestSize(engine, this.size);
       const komi = Number(this.komi) || 0;
-      const bot = this.engine;
-      const botPlayer = this.botPlayer;
-      const humanPlayer = this.humanPlayer;
-      const botLabel = bot === "topaz" ? "Topaz" : "Tiltak";
-      const humanLabel = humanPlayer === 1 ? "White" : "Black";
+      const strength = this.strength;
+      const humanPlayer = this.resolveHumanPlayer();
+      const botPlayer = 3 - humanPlayer;
 
-      const name = uniqueName(this.$store.state.game)(`${botLabel} vs You`);
+      const name = uniqueName(this.$store.state.game)(
+        humanPlayer === 1 ? `You vs ${botLabel}` : `${botLabel} vs You`
+      );
       const game = new Game({
         name,
         tags: {
           player1: humanPlayer === 1 ? "You" : botLabel,
           player2: humanPlayer === 1 ? botLabel : "You",
           size: String(size),
-          komi: Number(komi),
+          komi,
           site: this.$t("site_name"),
         },
-        config: { bot, botPlayer, player: humanPlayer },
+        config: {
+          bot: engine,
+          botPlayer,
+          player: humanPlayer,
+          botStrength: strength,
+        },
       });
 
+      this.persistSettings();
       this.$store.dispatch("game/ADD_GAME", game).then(() => {
         this.$store.dispatch("ui/SET_UI", [
           "player1",
@@ -163,18 +273,20 @@ export default {
           "player2",
           humanPlayer === 1 ? botLabel : "You",
         ]);
+        this.$store.dispatch("ui/SET_UI", ["size", String(size)]);
+        this.$store.dispatch("ui/SET_UI", ["komi", komi]);
         // Navigating away closes this route-driven dialog.
         this.$router.replace({ name: "local" });
       });
     },
     continueStart() {
-      const bot = this.engine;
-      const botPlayer = this.botPlayer;
-      const humanPlayer = this.humanPlayer;
+      const humanPlayer = this.resolveHumanPlayer();
+      this.persistSettings();
       this.$store.dispatch("game/SET_BOT", {
-        bot,
-        botPlayer,
+        bot: this.engine,
+        botPlayer: 3 - humanPlayer,
         player: humanPlayer,
+        botStrength: this.strength,
       });
       this.$router.replace({ name: "local" });
     },

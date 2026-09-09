@@ -5,16 +5,22 @@
 <script>
 import TopazWasm from "../bots/topaz-wasm";
 import TiltakWasm from "../bots/tiltak-wasm";
+import { botGameState, strengthLimits } from "../bots/botGame";
 
 // Plays the configured bot's moves in a local game. The game's config carries
-// `bot` (engine id) and `botPlayer` (1 = White, 2 = Black). Whenever the
-// position changes and it is the bot's turn, the engine is searched and the
-// best move is inserted.
+// `bot` (engine id), `botPlayer` (1 = White, 2 = Black) and `botStrength`
+// (search budget preset, resolved via bots/botGame). Whenever the position
+// changes and it is the bot's turn, the engine is searched and the best move
+// is inserted.
 export default {
   name: "BotOpponent",
   data() {
     return {
       engines: {},
+      // Per-engine signature of the last Tiltak teinewgame handshake. Tiltak
+      // only re-initializes when its JS state says so (see makeBotMove), so
+      // size/komi/game changes have to be detected here.
+      tiltakInits: {},
       busy: false,
     };
   },
@@ -89,6 +95,12 @@ export default {
       }
       return this.engines[id] || null;
     },
+    applyStrength(engine, id) {
+      const limits = strengthLimits(id, this.config.botStrength);
+      if (engine && limits) {
+        engine.settings = { ...engine.settings, ...limits };
+      }
+    },
     scheduleBotMove(force = false) {
       if (!this.bot || this.busy || !this.position) {
         return;
@@ -115,6 +127,7 @@ export default {
     async makeBotMove() {
       if (
         this.busy ||
+        !this.bot ||
         !this.position ||
         this.position.turn !== this.botPlayer
       ) {
@@ -124,24 +137,69 @@ export default {
       if (!engine) {
         return;
       }
+      const gameName = this.game.name;
+      const wasAtTip = !this.position.nextPly;
       this.busy = true;
+      botGameState.thinking = true;
       this.$store.dispatch("ui/SET_UI", ["disableBoard", true]);
       try {
         const size = this.config.size;
         const halfKomi = (this.config.komi || 0) * 2;
         const tps = this.position.tps;
         // Gameplay must use a bounded search regardless of the analysis
-        // interactive mode, so the bot always replies promptly.
+        // interactive mode, so the bot always replies promptly. Limits come
+        // from the game's strength preset (bots/botGame).
+        this.applyStrength(engine, this.bot);
+        if (this.bot === "tiltak") {
+          // TeiBot only re-runs its teinewgame handshake when
+          // isGameInitialized is false. Its wasm build panics on a TPS whose
+          // size doesn't match the initialized game, so force a fresh
+          // handshake whenever the game, size or komi changed since the last
+          // one (the decision is made synchronously inside searchPosition).
+          const init = this.tiltakInits[this.bot];
+          if (
+            engine.state.isGameInitialized &&
+            (!init ||
+              init.gameName !== gameName ||
+              init.size !== size ||
+              init.halfKomi !== halfKomi)
+          ) {
+            engine.setState({ isGameInitialized: false });
+          }
+        }
         const wasInteractive = engine.isInteractiveEnabled;
         engine.isInteractiveEnabled = false;
         let results;
         try {
-          // Single-PV only: gameplay just needs the best move.
-          results = await engine.searchPosition(size, halfKomi, tps, {
-            multipv: 1,
-          });
+          // Single-PV only: gameplay just needs the best move. TopazWasm
+          // takes an options object; Tiltak's TEI signature wants a plyID,
+          // which it doesn't need here.
+          results = await engine.searchPosition(
+            size,
+            halfKomi,
+            tps,
+            this.bot === "topaz" ? { multipv: 1 } : null
+          );
         } finally {
           engine.isInteractiveEnabled = wasInteractive;
+          if (this.bot === "tiltak") {
+            this.tiltakInits[this.bot] = { gameName, size, halfKomi };
+          }
+        }
+        // The user may have switched to a different game (or detached the
+        // bot / changed its side / browsed into history) while the search
+        // was running; the result belongs to the position it was requested
+        // for, so drop it instead of corrupting what is on screen now. A
+        // takeover request (forced move mid-line) is exempt: it was never
+        // at the tip to begin with.
+        if (
+          this.game.name !== gameName ||
+          !this.bot ||
+          this.position.turn !== this.botPlayer ||
+          this.position.isGameEnd ||
+          (wasAtTip && this.position.nextPly)
+        ) {
+          return;
         }
         const suggestions = results && results.suggestions;
         const pv = suggestions && suggestions[0] && suggestions[0].pv;
@@ -152,6 +210,7 @@ export default {
         console.error("BotOpponent:", error);
       } finally {
         this.busy = false;
+        botGameState.thinking = false;
         this.$store.dispatch("ui/SET_UI", ["disableBoard", false]);
       }
     },

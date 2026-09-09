@@ -721,7 +721,7 @@ export const SET_TIMER_LIVE = (state, live) => {
 // the toolbar and BotOpponent react to the change.
 export const SET_BOT = (
   state,
-  { bot, botPlayer, player, clear = false } = {}
+  { bot, botPlayer, player, botStrength, clear = false } = {}
 ) => {
   const game = Vue.prototype.$game;
   if (game) {
@@ -730,10 +730,12 @@ export const SET_BOT = (
       delete next.bot;
       delete next.botPlayer;
       delete next.player;
+      delete next.botStrength;
     } else {
       next.bot = bot;
       next.botPlayer = botPlayer;
       next.player = player;
+      next.botStrength = botStrength;
     }
     game.config = next;
     const stateGame = state.list.find((g) => g.name === game.name);
@@ -746,9 +748,10 @@ export const SET_BOT = (
     delete nextState.bot;
     delete nextState.botPlayer;
     delete nextState.player;
+    delete nextState.botStrength;
     state.config = nextState;
   } else {
-    state.config = { ...state.config, bot, botPlayer, player };
+    state.config = { ...state.config, bot, botPlayer, player, botStrength };
   }
 };
 

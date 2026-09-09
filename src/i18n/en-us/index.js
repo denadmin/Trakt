@@ -720,4 +720,29 @@ export default {
     "date-ptn": "yyyy.MM.dd",
     "time-ptn": "HH:mm:ss",
   },
+
+  botGame: {
+    strength: "Strength",
+    strengths: {
+      fast: "Fast",
+      normal: "Normal",
+      strong: "Strong",
+      max: "Maximum",
+    },
+    strengthHints: {
+      fast: "Brief search — casual play",
+      normal: "About a second per move",
+      strong: "Several seconds per move",
+      max: "Full strength — slow",
+    },
+    youPlay: "You play",
+    thinking: "{bot} is thinking",
+    yourMove: "Your move",
+    takeback: "Takeback",
+    takebackHint: "Undo your last move and the bot's reply",
+    resign: "Resign",
+    resignConfirm: "Resign this game? The bot wins.",
+    youResigned: "You resigned",
+    newGame: "New Bot Game",
+  },
 };
