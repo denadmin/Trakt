@@ -116,6 +116,69 @@ test("bot plays a reply and takeback removes the full move", async ({
   expect(await plyCount(page)).toBe(0);
 });
 
+test("navigation steps a full move so it lands on the human's turn", async ({
+  page,
+}) => {
+  await openApp(page);
+  await startBotGame(page, {
+    engine: "Tiltak",
+    size: "4 × 4",
+    strength: "Fast",
+  });
+
+  await page.click('[data-coord="a1"]');
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length === 2,
+    { timeout: 60000 }
+  );
+
+  // One step back from the tip lands past the human's move — not stuck on
+  // the bot's turn — and nothing is deleted.
+  await page.evaluate(() =>
+    window.app.$store.dispatch("game/PREV", { half: false, times: 1 })
+  );
+  await page.waitForTimeout(1000);
+  const back = await page.evaluate(() => {
+    const state = window.app.$store.state;
+    return {
+      plies: state.game.ptn.allPlies.length,
+      turn: state.game.position.turn,
+      ply: state.game.position.ply ? state.game.position.ply.id : null,
+      done: state.game.position.plyIsDone,
+    };
+  });
+  expect(back.plies).toBe(2);
+  expect(back.turn).toBe(1);
+  // The initial position in this app is "ply 0 undone" (empty board).
+  expect(back.ply).toBe(0);
+  expect(back.done).toBe(false);
+
+  // A different opening branches; the bot answers the new move.
+  await page.click('[data-coord="b2"]');
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length >= 4,
+    { timeout: 60000 }
+  );
+
+  // Stepping forward through history also advances past the bot's turn.
+  await page.evaluate(() => window.app.$store.dispatch("game/FIRST"));
+  await page.waitForTimeout(300);
+  await page.evaluate(() =>
+    window.app.$store.dispatch("game/NEXT", { half: false, times: 1 })
+  );
+  await page.waitForTimeout(1000);
+  const forward = await page.evaluate(() => {
+    const state = window.app.$store.state;
+    return {
+      turn: state.game.position.turn,
+      ply: state.game.position.ply ? state.game.position.ply.id : null,
+      done: state.game.position.plyIsDone,
+    };
+  });
+  expect(forward.turn).toBe(1);
+  expect(forward.done).toBe(true);
+});
+
 test("undoing the bot's reply does not make it replay", async ({ page }) => {
   await openApp(page);
   await startBotGame(page, {

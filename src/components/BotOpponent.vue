@@ -25,6 +25,10 @@ export default {
       // tip moved FORWARD (a freshly inserted move); going backward (undo of
       // the bot's reply, takeback) must not make it replay immediately.
       lastTipPlyID: null,
+      // Set on a game switch so the next position change is treated as
+      // direction-neutral (no paired navigation, no auto-reply decisions
+      // based on the previous game's tip).
+      pendingGameSwitch: false,
       busy: false,
     };
   },
@@ -58,9 +62,18 @@ export default {
       },
       deep: true,
     },
-    // Tip ids are per-game; a game switch invalidates the forward check.
+    // Tip ids are per-game; a game switch makes the next position change
+    // direction-neutral.
     "game.name"() {
-      this.lastTipPlyID = null;
+      this.pendingGameSwitch = true;
+    },
+    // While scrubbing, positions fly by and the paired-navigation below
+    // deliberately holds off; once the timeline is released, re-evaluate so
+    // the landing position ends on the human's turn.
+    "$store.state.ui.scrubbing"(scrubbing) {
+      if (!scrubbing) {
+        this.$nextTick(() => this.scheduleBotMove());
+      }
     },
     config: {
       handler(newConfig, oldConfig) {
@@ -121,10 +134,21 @@ export default {
       // bot's own move, takebacks and plain history navigation restore or
       // revisit existing plies; replying to those would undo the point of the
       // undo. A forced move (fresh attach / takeover) always goes through.
-      const movedForward =
-        force ||
-        (tipID !== null &&
-          (this.lastTipPlyID === null || tipID > this.lastTipPlyID));
+      let direction = 0; // -1: backward, +1: forward, 0: neutral
+      if (!force) {
+        if (this.pendingGameSwitch) {
+          this.pendingGameSwitch = false;
+        } else if (tipID !== null) {
+          if (this.lastTipPlyID === null) {
+            // Coming from a position without a done tip (start of the line).
+            direction = 1;
+          } else if (tipID > this.lastTipPlyID) {
+            direction = 1;
+          } else if (tipID < this.lastTipPlyID) {
+            direction = -1;
+          }
+        }
+      }
       this.lastTipPlyID = tipID;
       if (!this.bot || this.busy || !this.position) {
         return;
@@ -132,14 +156,51 @@ export default {
       if (this.position.isGameEnd) {
         return;
       }
+      const scrubbing = this.$store.state.ui.scrubbing;
+      // Step-wise navigation in a bot game lands on the bot's turns, where
+      // the human cannot interact — the game would look frozen with a bot
+      // that intentionally stays quiet. Navigation therefore moves in full
+      // moves: when it stops on the bot's turn, advance it once more so the
+      // human lands on their own decision point (their move plus the bot's
+      // recorded reply). Not while scrubbing, and never on a takeover.
+      if (
+        direction !== 0 &&
+        !scrubbing &&
+        this.position.plyIsDone &&
+        this.position.turn === this.botPlayer &&
+        this.position.nextPly
+      ) {
+        const plyID = this.position.ply.id;
+        this.$nextTick(() => {
+          const position = this.position;
+          if (
+            !this.busy &&
+            !this.$store.state.ui.scrubbing &&
+            position &&
+            position.plyIsDone &&
+            position.ply &&
+            position.ply.id === plyID &&
+            position.turn === this.botPlayer &&
+            position.nextPly
+          ) {
+            this.$store.dispatch(direction > 0 ? "game/NEXT" : "game/PREV", {
+              half: false,
+              times: 1,
+            });
+          }
+        });
+        return;
+      }
       // An undo (or trim) that removed the bot's reply leaves the game at the
       // bot's own turn, where the human cannot interact — the position would
       // be stuck with a bot that intentionally stays quiet. Remove the
       // human's move underneath as well, handing the turn back to them at
       // their previous decision point.
-      const atBotTurn =
-        !this.position.nextPly && this.position.turn === this.botPlayer;
-      if (!movedForward && atBotTurn) {
+      if (
+        direction === -1 &&
+        !this.position.nextPly &&
+        this.position.turn === this.botPlayer
+      ) {
         if (!this.position.ply) {
           // Empty board: the bot's forced opening move was undone. Its first
           // move is the only sensible continuation, so let it play.
@@ -173,7 +234,7 @@ export default {
           return;
         }
       }
-      if (!movedForward) {
+      if (direction < 0) {
         return;
       }
       // Only auto-play when the position is the live tip of the line. When
