@@ -753,9 +753,7 @@ test.describe("Branch Promotion Tests", () => {
       return game.plies
         .filter(
           (ply) =>
-            ply.branches &&
-            ply.branches.length > 1 &&
-            ply.branches[0] === ply
+            ply.branches && ply.branches.length > 1 && ply.branches[0] === ply
         )
         .map((ply) => ({
           id: ply.id,
@@ -806,9 +804,7 @@ test.describe("Branch Promotion Tests", () => {
       return game.plies
         .filter(
           (ply) =>
-            ply.branches &&
-            ply.branches.length > 1 &&
-            ply.branches[0] === ply
+            ply.branches && ply.branches.length > 1 && ply.branches[0] === ply
         )
         .map((ply) => ({
           id: ply.id,

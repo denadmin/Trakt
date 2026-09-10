@@ -14,6 +14,7 @@
       <bot-game-form
         ref="form"
         :continue-mode="continueMode"
+        @can-start="canStart = $event"
         @started="onStarted"
       />
       <q-card-actions align="right">
@@ -26,7 +27,13 @@
         />
         <div class="col-grow" />
         <q-btn :label="$t('Cancel')" color="primary" flat @click="cancel" />
-        <q-btn :label="$t('Start')" color="primary" flat @click="start" />
+        <q-btn
+          :label="$t('Start')"
+          color="primary"
+          flat
+          :disable="!canStart"
+          @click="start"
+        />
       </q-card-actions>
     </q-card>
   </small-dialog>
@@ -41,6 +48,11 @@ import BotGameForm from "../components/controls/BotGameForm";
 export default {
   name: "BotGame",
   components: { BotGameForm },
+  data() {
+    return {
+      canStart: true,
+    };
+  },
   computed: {
     continueMode() {
       return this.$route.query.continue === "1";

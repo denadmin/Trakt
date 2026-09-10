@@ -121,19 +121,24 @@ export default {
       const result = this.game.ptn.tags.result;
       return !!result && result.text !== "0-0";
     },
-    // A takeback removes the bot's reply plus the human's move before it, so
-    // it needs both plies to exist, the human to be on turn at the tip, and
-    // the bot to be idle.
+    // A takeback restores the human's last decision point. Normally that is
+    // the bot's reply plus the human's move before it; when the game ended on
+    // the human's own move (their winning road), only that final move needs
+    // to go. Takeback stays available after a rules-based game end so the
+    // finish can be rolled back and play continued.
     canTakeback() {
-      return (
-        !this.gameEnded &&
-        !this.thinking &&
-        !!this.position &&
-        !this.position.nextPly &&
-        this.position.plyIsDone &&
-        this.position.turn === this.humanPlayer &&
-        !!this.position.prevPly
-      );
+      if (this.thinking || !this.position || this.position.nextPly) {
+        return false;
+      }
+      if (!this.position.plyIsDone || ![1, 2].includes(this.humanPlayer)) {
+        return false;
+      }
+      if (this.position.turn === this.humanPlayer) {
+        return !!this.position.prevPly;
+      }
+      // Bot to move at the tip: only a human move sitting there finished the
+      // game (otherwise the bot would be replying right now).
+      return this.isGameEnd;
     },
   },
   methods: {
@@ -141,7 +146,13 @@ export default {
       if (!this.canTakeback) {
         return;
       }
-      const plyIDs = [this.position.ply.id, this.position.prevPly.id];
+      // Deleting the tip flips the turn back to its mover. When that is the
+      // bot, the human's move underneath must go too — otherwise the bot
+      // would instantly reply again.
+      const plyIDs = [this.position.ply.id];
+      if (this.position.turn === this.humanPlayer && this.position.prevPly) {
+        plyIDs.push(this.position.prevPly.id);
+      }
       this.$store.dispatch("game/CANCEL_MOVE");
       // Both deletions land in the same tick, so the bot's move watcher
       // fires once, on the restored position — where it is the human's turn

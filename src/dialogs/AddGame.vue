@@ -61,7 +61,11 @@
           </q-tab-panel>
 
           <q-tab-panel name="vsbot" class="q-pa-none">
-            <BotGameForm ref="botForm" @started="onBotStarted" />
+            <BotGameForm
+              ref="botForm"
+              @can-start="canStart = $event"
+              @started="onBotStarted"
+            />
           </q-tab-panel>
         </q-tab-panels>
       </smooth-reflow>
@@ -76,7 +80,7 @@
         <q-btn
           :label="tab === 'vsbot' ? $t('Start') : $t('OK')"
           @click="ok"
-          :disabled="tab === 'load'"
+          :disabled="tab === 'load' || (tab === 'vsbot' && !canStart)"
           color="primary"
           flat
         />
@@ -110,6 +114,7 @@ export default {
   },
   data() {
     return {
+      canStart: true,
       tags: {
         player1: this.$store.state.ui.player1,
         player2: this.$store.state.ui.player2,

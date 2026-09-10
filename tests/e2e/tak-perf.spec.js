@@ -202,10 +202,18 @@ test("tak check performance: tiltak vs syntaks", async ({ page }) => {
   console.log(`  iterations: ${ITERATIONS}`);
   console.log(`  total calls per engine per run: ${stats.totalCalls}`);
   console.log(
-    `  tiltak:  ${stats.tiltak.run1Ms.toFixed(1)} / ${stats.tiltak.run2Ms.toFixed(1)} ms  (~${stats.tiltak.avgUsPerCall.toFixed(1)} µs/call)`
+    `  tiltak:  ${stats.tiltak.run1Ms.toFixed(
+      1
+    )} / ${stats.tiltak.run2Ms.toFixed(
+      1
+    )} ms  (~${stats.tiltak.avgUsPerCall.toFixed(1)} µs/call)`
   );
   console.log(
-    `  syntaks: ${stats.syntaks.run1Ms.toFixed(1)} / ${stats.syntaks.run2Ms.toFixed(1)} ms  (~${stats.syntaks.avgUsPerCall.toFixed(1)} µs/call)`
+    `  syntaks: ${stats.syntaks.run1Ms.toFixed(
+      1
+    )} / ${stats.syntaks.run2Ms.toFixed(
+      1
+    )} ms  (~${stats.syntaks.avgUsPerCall.toFixed(1)} µs/call)`
   );
   const ratio = stats.syntaks.avgUsPerCall / stats.tiltak.avgUsPerCall;
   console.log(

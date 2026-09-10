@@ -5,7 +5,7 @@
 <script>
 import TopazWasm from "../bots/topaz-wasm";
 import TiltakWasm from "../bots/tiltak-wasm";
-import { botGameState, strengthLimits } from "../bots/botGame";
+import { botGameState, strengthLimits, supportsSize } from "../bots/botGame";
 
 // Plays the configured bot's moves in a local game. The game's config carries
 // `bot` (engine id), `botPlayer` (1 = White, 2 = Black) and `botStrength`
@@ -21,6 +21,10 @@ export default {
       // only re-initializes when its JS state says so (see makeBotMove), so
       // size/komi/game changes have to be detected here.
       tiltakInits: {},
+      // Tip ply id at the last position change. The bot only replies when the
+      // tip moved FORWARD (a freshly inserted move); going backward (undo of
+      // the bot's reply, takeback) must not make it replay immediately.
+      lastTipPlyID: null,
       busy: false,
     };
   },
@@ -40,6 +44,12 @@ export default {
     botPlayer() {
       return this.config.botPlayer;
     },
+    tipPlyID() {
+      const position = this.position;
+      return position && position.ply && position.plyIsDone
+        ? position.ply.id
+        : null;
+    },
   },
   watch: {
     position: {
@@ -47,6 +57,10 @@ export default {
         this.scheduleBotMove();
       },
       deep: true,
+    },
+    // Tip ids are per-game; a game switch invalidates the forward check.
+    "game.name"() {
+      this.lastTipPlyID = null;
     },
     config: {
       handler(newConfig, oldConfig) {
@@ -102,10 +116,64 @@ export default {
       }
     },
     scheduleBotMove(force = false) {
+      const tipID = this.tipPlyID;
+      // Only treat an increased tip id as "the human moved". Undo/redo of the
+      // bot's own move, takebacks and plain history navigation restore or
+      // revisit existing plies; replying to those would undo the point of the
+      // undo. A forced move (fresh attach / takeover) always goes through.
+      const movedForward =
+        force ||
+        (tipID !== null &&
+          (this.lastTipPlyID === null || tipID > this.lastTipPlyID));
+      this.lastTipPlyID = tipID;
       if (!this.bot || this.busy || !this.position) {
         return;
       }
       if (this.position.isGameEnd) {
+        return;
+      }
+      // An undo (or trim) that removed the bot's reply leaves the game at the
+      // bot's own turn, where the human cannot interact — the position would
+      // be stuck with a bot that intentionally stays quiet. Remove the
+      // human's move underneath as well, handing the turn back to them at
+      // their previous decision point.
+      const atBotTurn =
+        !this.position.nextPly && this.position.turn === this.botPlayer;
+      if (!movedForward && atBotTurn) {
+        if (!this.position.ply) {
+          // Empty board: the bot's forced opening move was undone. Its first
+          // move is the only sensible continuation, so let it play.
+          this.$nextTick(() => {
+            if (
+              !this.busy &&
+              !this.position.ply &&
+              this.position.turn === this.botPlayer
+            ) {
+              this.makeBotMove();
+            }
+          });
+          return;
+        }
+        if (this.position.plyIsDone) {
+          const plyID = this.position.ply.id;
+          this.$nextTick(() => {
+            const position = this.position;
+            if (
+              !this.busy &&
+              position &&
+              !position.nextPly &&
+              position.plyIsDone &&
+              position.ply &&
+              position.ply.id === plyID &&
+              position.turn === this.botPlayer
+            ) {
+              this.$store.dispatch("game/DELETE_PLY", plyID);
+            }
+          });
+          return;
+        }
+      }
+      if (!movedForward) {
         return;
       }
       // Only auto-play when the position is the live tip of the line. When
@@ -146,6 +214,19 @@ export default {
         const size = this.config.size;
         const halfKomi = (this.config.komi || 0) * 2;
         const tps = this.position.tps;
+        // A search on an unsupported board would kill the engine's worker
+        // (topaz traps outside 5/6, tiltak outside 4/5/6) and leave the bot
+        // "thinking" forever — detach it with a visible reason instead.
+        if (!supportsSize(this.bot, size)) {
+          this.$store.dispatch("game/STOP_BOT");
+          this.notifyError(
+            this.$t("botGame.unsupportedSize", {
+              engine: this.bot === "tiltak" ? "Tiltak" : "Topaz",
+              size,
+            })
+          );
+          return;
+        }
         // Gameplay must use a bounded search regardless of the analysis
         // interactive mode, so the bot always replies promptly. Limits come
         // from the game's strength preset (bots/botGame).

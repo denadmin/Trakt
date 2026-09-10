@@ -11,7 +11,9 @@ export default class TiltakWasm extends TeiBot {
       description: "analysis.engines_description.tiltak",
       isInteractive: true,
       requiresConnect: false,
-      sizeHalfKomis: { 5: [0, 4], 6: [0, 4] },
+      // 4 is playable by the wasm engine (teinewgame accepts 4/5/6) even
+      // though the default tournament setup omits it.
+      sizeHalfKomis: { 4: [0, 4], 5: [0, 4], 6: [0, 4] },
       state: {
         isTeiOk: false,
       },

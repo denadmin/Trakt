@@ -91,14 +91,14 @@ test("bot plays a reply and takeback removes the full move", async ({
   });
 
   // A fresh local game vs bot: human (White) to move, bot (Black) waiting.
-  expect(
-    await page.evaluate(() => window.app.$game.config.bot)
-  ).toBe("tiltak");
+  expect(await page.evaluate(() => window.app.$game.config.bot)).toBe("tiltak");
   expect(await plyCount(page)).toBe(0);
 
   // Human's opening move.
   await page.click('[data-coord="a1"]');
-  await page.waitForFunction(() => window.app.$store.state.game.ptn.allPlies.length === 1);
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length === 1
+  );
 
   // The bot replies (bounded "Fast" search keeps this quick).
   await page.waitForFunction(
@@ -109,9 +109,68 @@ test("bot plays a reply and takeback removes the full move", async ({
   // Takeback removes the bot's reply and the human's move, and the bot must
   // not immediately replay on its own.
   await page.click(".bot-game-bar button >> nth=0");
-  await page.waitForFunction(() => window.app.$store.state.game.ptn.allPlies.length === 0);
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length === 0
+  );
   await page.waitForTimeout(1000);
   expect(await plyCount(page)).toBe(0);
+});
+
+test("undoing the bot's reply does not make it replay", async ({ page }) => {
+  await openApp(page);
+  await startBotGame(page, {
+    engine: "Tiltak",
+    size: "4 × 4",
+    strength: "Fast",
+  });
+
+  await page.click('[data-coord="a1"]');
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length === 2,
+    { timeout: 60000 }
+  );
+
+  // Undo removes the bot's reply AND the human's move underneath (the bot
+  // would otherwise own the turn the human cannot interact with), returning
+  // to the empty board; the bot must stay quiet instead of replaying.
+  await page.evaluate(() => window.app.$store.dispatch("game/UNDO"));
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length === 0
+  );
+  await page.waitForTimeout(1500);
+  expect(await plyCount(page)).toBe(0);
+
+  // The human moves again — the bot answers the new move.
+  await page.click('[data-coord="b1"]');
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length >= 2,
+    { timeout: 60000 }
+  );
+});
+
+test("continue dialog filters engines that cannot play the board", async ({
+  page,
+}) => {
+  await openApp(page);
+  // Load a 4x4 game, then open the toolbar's continue dialog.
+  await page.evaluate(() =>
+    window.app.$store.dispatch("game/ADD_GAME", {
+      ptn: '[Size "4"]\n\n1. a1 b1\n',
+      name: "Small Board",
+    })
+  );
+  await page.waitForFunction(() => window.app.$game.config.size === 4);
+  await page.evaluate(() => {
+    window.app.$router.push({ name: "bot-game", query: { continue: "1" } });
+  });
+  await page.waitForSelector('.q-dialog:has-text("Engine")');
+  await page.click('.q-dialog .q-field:has-text("Engine")');
+  await page.waitForSelector(".q-menu .q-item");
+  const engineTexts = await page.$$eval(".q-menu .q-item", (items) =>
+    items.map((item) => item.textContent.trim())
+  );
+  expect(engineTexts.some((text) => text.includes("Topaz"))).toBe(false);
+  expect(engineTexts.some((text) => text.includes("Tiltak"))).toBe(true);
 });
 
 test("resign records the result and detaches the bot", async ({ page }) => {
@@ -123,9 +182,12 @@ test("resign records the result and detaches the bot", async ({ page }) => {
   });
 
   await page.click('[data-coord="c3"]');
-  await page.waitForFunction(() => window.app.$store.state.game.ptn.allPlies.length === 2, {
-    timeout: 60000,
-  });
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length === 2,
+    {
+      timeout: 60000,
+    }
+  );
 
   // Resign (with confirm) — human is White, so Black wins by resignation.
   await page.click(".bot-game-bar button >> nth=1");

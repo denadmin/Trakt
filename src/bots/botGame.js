@@ -114,6 +114,16 @@ export function loadSettings($q, defaults) {
   } catch (error) {
     saved = {};
   }
+  // The side toggle used to select the human's color ("humanPlayer"); it now
+  // selects the bot's, so migrate older saved values.
+  if (
+    saved.humanPlayer !== undefined &&
+    saved.botPlayer === undefined &&
+    saved.humanPlayer !== "random"
+  ) {
+    saved.botPlayer = 3 - saved.humanPlayer;
+    delete saved.humanPlayer;
+  }
   const settings = { ...defaults };
   Object.keys(defaults).forEach((key) => {
     if (saved[key] !== undefined && saved[key] !== null) {
@@ -130,8 +140,8 @@ export function loadSettings($q, defaults) {
   if (!KOMI_CHOICES.includes(Number(settings.komi))) {
     settings.komi = defaults.komi;
   }
-  if (![1, 2, "random"].includes(settings.humanPlayer)) {
-    settings.humanPlayer = defaults.humanPlayer;
+  if (![1, 2, "random"].includes(settings.botPlayer)) {
+    settings.botPlayer = defaults.botPlayer;
   }
   return settings;
 }
