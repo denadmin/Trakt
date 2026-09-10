@@ -305,3 +305,34 @@ test("stop bot detaches the bot without ending the game", async ({ page }) => {
     })
   ).toBe(true);
 });
+
+test("undo/redo buttons hide in bot games and return after stopping the bot", async ({
+  page,
+}) => {
+  await openApp(page);
+  await startBotGame(page, {
+    engine: "Tiltak",
+    size: "4 × 4",
+    strength: "Fast",
+  });
+
+  // In a bot game the rollback lives in the bot bar and the paired nav
+  // arrows; the footer undo/redo pair would be redundant. (The bot bar's
+  // own takeback icon also matches "undo", so scope to the nav toolbar.)
+  expect(
+    await page.locator(".q-footer .footer-toolbar .mdi-undo").count()
+  ).toBe(0);
+  expect(
+    await page.locator(".q-footer .footer-toolbar .mdi-redo").count()
+  ).toBe(0);
+
+  // Stop the bot — the pair returns for free editing.
+  await page.click(".bot-game-bar button >> nth=3");
+  await page.waitForSelector(".bot-game-bar", { state: "detached" });
+  expect(
+    await page.locator(".q-footer .footer-toolbar .mdi-undo").count()
+  ).toBe(1);
+  expect(
+    await page.locator(".q-footer .footer-toolbar .mdi-redo").count()
+  ).toBe(1);
+});

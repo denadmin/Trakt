@@ -90,33 +90,33 @@
           {{ $t("End") }}
         </hint>
       </q-btn>
-      <q-separator v-if="!$store.state.ui.disableUndo" vertical />
-      <q-btn
-        v-if="!$store.state.ui.disableUndo"
-        @touchstart="vibrate"
-        @click="$store.dispatch('game/UNDO')"
-        stretch
-        flat
-        :color="fg"
-        v-ripple="false"
-        :disable="!canUndo"
-        icon="undo"
-      >
-        <hint v-if="canUndo">{{ $t("Undo") }}</hint>
-      </q-btn>
-      <q-btn
-        v-if="!$store.state.ui.disableUndo"
-        @touchstart="vibrate"
-        @click="$store.dispatch('game/REDO')"
-        stretch
-        flat
-        :color="fg"
-        v-ripple="false"
-        :disable="!canRedo"
-        icon="redo"
-      >
-        <hint v-if="canRedo">{{ $t("Redo") }}</hint>
-      </q-btn>
+      <template v-if="showUndo">
+        <q-separator vertical />
+        <q-btn
+          @touchstart="vibrate"
+          @click="$store.dispatch('game/UNDO')"
+          stretch
+          flat
+          :color="fg"
+          v-ripple="false"
+          :disable="!canUndo"
+          icon="undo"
+        >
+          <hint v-if="canUndo">{{ $t("Undo") }}</hint>
+        </q-btn>
+        <q-btn
+          @touchstart="vibrate"
+          @click="$store.dispatch('game/REDO')"
+          stretch
+          flat
+          :color="fg"
+          v-ripple="false"
+          :disable="!canRedo"
+          icon="redo"
+        >
+          <hint v-if="canRedo">{{ $t("Redo") }}</hint>
+        </q-btn>
+      </template>
     </div>
   </div>
 </template>
@@ -141,6 +141,14 @@ export default {
     },
     isBoardDisabled() {
       return this.$store.state.ui.disableBoard;
+    },
+    // In a bot game the undo/redo pair is redundant: rolling back is a full
+    // move through the nav arrows (paired) or the bot bar's takeback, and
+    // there is nothing worth redoing — the bot answers restored moves afresh.
+    showUndo() {
+      return (
+        !this.$store.state.ui.disableUndo && !this.$store.state.game.config.bot
+      );
     },
     fg() {
       return this.$store.state.ui.theme.isDark ? "textLight" : "textDark";
