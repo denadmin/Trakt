@@ -203,8 +203,22 @@ test("undoing the bot's reply does not make it replay", async ({ page }) => {
   await page.waitForTimeout(1500);
   expect(await plyCount(page)).toBe(0);
 
-  // The human moves again — the bot answers the new move.
-  await page.click('[data-coord="b1"]');
+  // The rollback went through history, so redo (the arrow-forward) must be
+  // available and bring the human's move back; the bot answers it afresh.
+  const redoState = await page.evaluate(() => {
+    const game = window.app.$store.state.game;
+    return {
+      canRedo: game.historyIndex < game.history.length,
+      disableBoard: window.app.$store.state.ui.disableBoard,
+    };
+  });
+  expect(redoState.canRedo).toBe(true);
+  expect(redoState.disableBoard).toBe(false);
+
+  await page.evaluate(() => window.app.$store.dispatch("game/REDO"));
+  await page.waitForFunction(
+    () => window.app.$store.state.game.ptn.allPlies.length >= 1
+  );
   await page.waitForFunction(
     () => window.app.$store.state.game.ptn.allPlies.length >= 2,
     { timeout: 60000 }

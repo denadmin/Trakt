@@ -193,46 +193,40 @@ export default {
       }
       // An undo (or trim) that removed the bot's reply leaves the game at the
       // bot's own turn, where the human cannot interact — the position would
-      // be stuck with a bot that intentionally stays quiet. Remove the
-      // human's move underneath as well, handing the turn back to them at
-      // their previous decision point.
+      // be stuck with a bot that intentionally stays quiet. Keep rolling back
+      // through history to the human's last decision point: undoing through
+      // history (instead of deleting plies) keeps the redo stack alive, so
+      // the arrow-forward can bring the move back and the bot answers it
+      // afresh.
       if (
         direction === -1 &&
         !this.position.nextPly &&
         this.position.turn === this.botPlayer
       ) {
-        if (!this.position.ply) {
-          // Empty board: the bot's forced opening move was undone. Its first
-          // move is the only sensible continuation, so let it play.
-          this.$nextTick(() => {
-            if (
-              !this.busy &&
-              !this.position.ply &&
-              this.position.turn === this.botPlayer
-            ) {
+        const canUndo = this.game.historyIndex > 0;
+        this.$nextTick(() => {
+          if (this.busy || !this.bot) {
+            return;
+          }
+          const position = this.position;
+          if (
+            !position ||
+            position.nextPly ||
+            position.turn !== this.botPlayer
+          ) {
+            return;
+          }
+          if (!position.ply || !canUndo) {
+            // Empty board with nothing left to undo: the bot's forced
+            // opening move is the only sensible continuation.
+            if (!position.ply) {
               this.makeBotMove();
             }
-          });
-          return;
-        }
-        if (this.position.plyIsDone) {
-          const plyID = this.position.ply.id;
-          this.$nextTick(() => {
-            const position = this.position;
-            if (
-              !this.busy &&
-              position &&
-              !position.nextPly &&
-              position.plyIsDone &&
-              position.ply &&
-              position.ply.id === plyID &&
-              position.turn === this.botPlayer
-            ) {
-              this.$store.dispatch("game/DELETE_PLY", plyID);
-            }
-          });
-          return;
-        }
+            return;
+          }
+          this.$store.dispatch("game/UNDO");
+        });
+        return;
       }
       if (direction < 0) {
         return;

@@ -146,20 +146,19 @@ export default {
       if (!this.canTakeback) {
         return;
       }
-      // Deleting the tip flips the turn back to its mover. When that is the
-      // bot, the human's move underneath must go too — otherwise the bot
-      // would instantly reply again.
-      const plyIDs = [this.position.ply.id];
-      if (this.position.turn === this.humanPlayer && this.position.prevPly) {
-        plyIDs.push(this.position.prevPly.id);
-      }
+      // Roll back through history (rather than deleting plies) so the
+      // arrow-forward (redo) can bring the moves back; on redo the bot
+      // simply answers the restored move afresh. Deleting the tip flips the
+      // turn to its mover: when that is the bot, the human's move underneath
+      // must go too.
+      const undos = this.position.turn === this.humanPlayer ? 2 : 1;
       this.$store.dispatch("game/CANCEL_MOVE");
-      // Both deletions land in the same tick, so the bot's move watcher
-      // fires once, on the restored position — where it is the human's turn
-      // and the bot stays idle.
-      plyIDs.forEach((plyID) => {
-        this.$store.dispatch("game/DELETE_PLY", plyID);
-      });
+      // Both undos land in the same tick, so the bot's move watcher fires
+      // once, on the restored position — where it is the human's turn and
+      // the bot stays idle.
+      for (let i = 0; i < undos; i++) {
+        this.$store.dispatch("game/UNDO");
+      }
     },
     resign() {
       const humanPlayer = this.humanPlayer;
